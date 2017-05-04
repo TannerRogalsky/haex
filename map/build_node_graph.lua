@@ -9,7 +9,7 @@ local function node(x, y, v)
 end
 
 local function safeInsert(to, from, y, x)
-  local col, o = grid_copy[y]
+  local col, o = from[y]
   if col then o = col[x] end
   if o then table.insert(to, o) end
 end
@@ -17,7 +17,7 @@ end
 local function buildNodeGraph(map)
   local node_graph = {}
   for y,col in ipairs(map) do
-    node_graph[i] = {}
+    node_graph[y] = {}
     for x,v in ipairs(col) do
       node_graph[y][x] = node(x, y, v)
     end
@@ -35,3 +35,5 @@ local function buildNodeGraph(map)
 
   return node_graph
 end
+
+return buildNodeGraph

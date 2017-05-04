@@ -4,23 +4,23 @@ local AStar = require('lib.astar')
 local findDeadEnds = require('map.find_dead_ends')
 local buildNodeGraph = require('map.build_node_graph')
 
+local function adjacency(node)
+  return ipairs(node.neighbors)
+end
+
+local function cost(current, neighbor)
+  return 1
+end
+
+local function distance(start, goal)
+  return math.abs(start.x - goal.x) + math.abs(start.y - goal.y)
+end
+
+local astar = AStar:new(adjacency, cost, distance)
+
 local function findLongestPath(grid)
   local deadends = findDeadEnds(grid)
   local node_graph = buildNodeGraph(grid)
-
-  local function adjacency(node)
-    return ipairs(node.neighbors)
-  end
-
-  local function cost(current, neighbor)
-    return 1
-  end
-
-  local function distance(start, goal)
-    return math.abs(start.x - goal.x) + math.abs(start.y - goal.y)
-  end
-
-  local astar = AStar:new(adjacency, cost, distance)
 
   if #deadends < 2 then
     return astar:find_path(node_graph[1][1], node_graph[#node_graph][#node_graph[1]])
