@@ -30,9 +30,11 @@ Grid = require("lib.grid")
 Line = require("lib.line")
 Boid = require("lib.boid")
 push = require("lib.push.push")
+ShaderManager = require('lib.shader_manager')
 
 Base = require("base")
 Game = require("game")
+Player = require("player")
 
 Direction = require("direction")
 

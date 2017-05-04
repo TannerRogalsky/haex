@@ -1,0 +1,308 @@
+ _______ ______ _______ _____  _______ _______ ______ __  __ 
+|     __|   __ \_     _|     \|   |   |   _   |      |  |/  |
+|    |  |      <_|   |_|  --  |       |       |   ---|     < 
+|_______|___|__|_______|_____/|___|___|___|___|______|__|\__|
+
+
+1. ABOUT
+
+
+Gridhack is an IRC game coded by Fraxtil. It is a derivative of a game called
+Cyberzone, created by blue_tetris and coded by thecalcgenius.
+
+
+2. QUICK START
+
+
+This is a brief overview of how to play the game, intended for newcomers.
+
+All players are on a virtual two-dimensional grid. Rows are marked by letters
+and columns by numbers, like Battleship. You know your own location, everything
+that is in your row, and everything that is in your column. When it's your turn,
+you can move across your row or column as far as you want, like a rook in chess.
+When you move, your previous location becomes a hole in the grid. If any player
+falls through a hole, they lose the game. If player 1 moves into the same
+location as player 2, player 2 is "hacked" and loses the game. Therefore the
+objective of the game is to avoid falling through holes and to hack your rivals.
+
+Sometimes "programs" are placed on the grid. Programs are usually helpful, but
+sometimes can be dangerous. Pursue them at your own risk and read section 7 for
+more information on them.
+
+
+3. TERMINOLOGY
+
+
+People:
+  Hacker	Any player. Usually refers to the player whose turn it is.
+  Rival		Any player other than the one whose turn it is.
+  Initializer	The player who started the game.
+  SysOp		The (fictitious) overseer of the Grid who looks out for Hackers.
+
+Things:
+  Grid		The playing field.
+  Program	A hacking device on the Grid.
+  Flag		An attribute of a Program that modifies its behavior.
+  Shell		The Hacker's private interface (their query with the bot).
+  Chatroom	The public interface (the channel where the bot resides).
+
+Actions:
+  Jack In	Connect to the Grid.
+  Hacked	Disconnected from the Grid by a Hacker.
+  Ejected	Disconnected from the Grid by the SysOp.
+  announce	Send to the Chatroom.
+  reveal	Send from the bot to a Hacker's Shell.
+  input		Send from a Hacker to the bot (via their Shell, obviously).
+  
+
+Grid terms:
+  location	A row-column pair. A1 represents the first row's first column.
+  coordinate	Either the row (letter) or column (number) of a location.
+  view		All locations that are in either of a Hacker's coordinates -
+		that is, all locations that a Hacker can see on their turn.
+  hole		A location that has been visited by a Hacker.
+  space		A location that is not a hole.
+  free space	A space that is not occupied by a Hacker.
+  empty space	A free space that does not contain a Program.
+
+
+4. RULES
+
+
+Any user in the Chatroom can start a game by announcing "gridhack". That user is
+automatically Jacked In and becomes the Initializer. Other users may Jack In by
+announcing "jack". While users are joining the game, the Initializer must
+configure the game via the method described in the following section. Once all
+users who wish to play are Jacked In, the Initializer must announce "done". The
+Initializer can also announce "reset" at any time to halt the game.
+
+Each Hacker is instructed to input "load" to confirm their presence. Once all
+Hackers have done this, the actual game will begin. Each Hacker is placed on a
+random location on the Grid, as well as any programs configured to be preloaded
+via the configuration option "preload grid". Each Hacker is also given any
+Programs listed in "preload hackers". Hackers are then randomly sorted by the
+bot and will take turns sequentially.
+
+At the beginning of a Hacker's turn, the bot will reveal to them their current
+location, the number of holes in each of their own coordinates, and any Rivals
+or Programs in those coordinates. Program names are surrounded by brackets and
+Rival names are surrounded by parentheses. Some examples:
+  Your location is C5. 2 holes and (Bob) are in row C. 1 hole, [ESC], and
+    (Alice) are in column 5.
+  Your location is A1. Nothing in row A. [Peekaboo], [Timewarp], and (Joe) are
+    in column 1.
+  Your location is F10. Nothing in row F or column 10.
+The Hacker is also instructed to choose a row or column to move into; if they
+choose to move into a different row, their column is preserved, and vice-versa.
+That means that a player in B2 can move into A2, C2, D2... and B1, B3, B4... but
+not A1, C5, F10, etc.
+
+If the Hacker moves into a hole, they are exposed to the SysOp who will
+immediately Eject them from the Grid. Their location and loss are announced. If
+the Hacker moves into a space occupied by a Rival, that Rival is Hacked, and
+their location and loss are announced (thus revealing the Hacker's location). If
+the Hacker moves into a space occupied by a Program, the acquisition is
+announced, but not the location. Most Programs require immediate input from the
+Hacker and will be used and deleted after this input is given. Some programs are
+kept by the Hacker indefinitely, or until used during a turn. Programs with the
+flag ONDEM can be activated during the Hacker's turn if they input the program's
+name instead of a location.
+
+After the Hacker has made their move, the space which they previously occupied
+is changed to a hole. The next Hacker must then take their turn. Once there is
+only one Hacker remaining on the Grid, that Hacker has achieved eliteness and
+wins the game.
+
+
+5. CONFIGURING GRIDHACK
+
+
+The Initializer will have to configure the game by announcing "config Option
+Value" for each Option until they are satisfied with the configuration. When
+they are done and anybody who wishes to play is Jacked In, they must announce
+"done". Below are the available Options and their acceptable Values.
+
+size
+  Changes the size of the Grid.
+  Value: XxY, where X and Y are the number of rows and columns (respectively)
+  and are integers between the total number of players and 25.
+  Example: 8x8
+preload grid
+  Which programs should be placed on the Grid at the start of the game.
+  Value: a list of Programs, comma-separated.
+  Example: GridCloakII, SectorReboot, BirdsEye
+preload hackers
+  Which programs every Hacker should have at the start of the game.
+  Value: same syntax as preload-grid, but Programs must have flag PERS.
+  Example: GridCloak
+disable
+  Which programs will never appear on the Grid.
+  Value: same syntax as "preload grid".
+interval
+  How often a Program will be dropped on the Grid.
+  Value: a nonzero positive integer. Example: 3 (this will cause a Program to
+  drop after every third turn)
+
+
+6. FLAGS
+
+
+Flags modify the behavior of programs.
+
+1SHOT
+  One-shot. The Program will take input when it is obtained and then immediately
+  self-destruct after it has served its purpose.
+ONDEM
+  On Demand. The Program can be used whenever the Hacker desires as a substitute
+  for using "goto". It will announce when it is used.
+PERS
+  Persistent. The Program will remain in the background until it deletes itself,
+  if such a thing ever happens. It may alter the game while it is running.
+NORM
+  Normal. The Program appears as often as any other.
+RARE
+  Rare. The Program does not appear often (half as often as most).
+VRARE
+  Very Rare. The Program hardly ever appears (one tenth as often as most).
+
+
+7. PROGRAMS
+
+
+By default, when a Hacker acquires a Program, both the Hacker and the name of
+the acquired Program will be announced. This behavior can be changed via flags,
+which are listed underneath each program's description.
+
+GridCloak
+  Prevents a Hacker from being Ejected by the SysOp if they move into a hole.
+  Can only be used once.
+  PERS  NORM
+GridCloakII
+  Same as GridCloak, but does not announce the hole location.
+  PERS  RARE
+Peekaboo
+  Reveals the chosen coordinate of a Rival.
+  1SHOT NORM
+PeekabooII
+  Same as Peekaboo, but also reveals that coordinate of the Hacker to the Rival.
+  1SHOT RARE
+PeekabooIII
+  Similar to Peekaboo. Announces the chosen coordinate of ALL Hackers.
+  1SHOT VRARE
+Rootkit
+  Gives special Grid access to the Hacker. This pseudo-program is a dependency
+  for a few other programs.
+  PERS  RARE
+Gotcha
+  The Hacker can no longer be Hacked; if a Rival moves into their location, that
+  Rival will be Hacked instead of the Hacker themself. Like GridCloak, it can
+  only be used once.
+  PERS  RARE
+GotchaII
+  Same as Gotcha, but can be used infinitely. Requires Rootkit.
+  PERS  VRARE
+P2PSnitch
+  Reveals the exact location of a chosen Rival to the Hacker. Also reveals the
+  Hacker's exact location to said Rival, unless the Hacker has Rootkit.
+  1SHOT NORM
+LineLeak
+  Announces a coordinate of the Rival whose turn is next. The coordinate will be
+  whatever the Rival changes on their next move.
+  PERS  NORM
+LineLeakII
+  Same as LineLeak, but applies to ALL Rivals on their next turns, followed by
+  the Hacker themself (unless they have Rootkit).
+  PERS  RARE
+SilverBullet
+  Hacks a chosen Rival if the Hacker can correctly determine one of their
+  coordinates. Announces that coordinate of the Hacker if they are incorrect.
+  1SHOT NORM
+SilverBulletII
+  Similar to SilverBullet. Hacks ALL Hackers that are in a chosen coordinate.
+  Announces the Hacker's location if nobody is Hacked.
+  1SHOT RARE
+SilverBulletIII
+  Similar to SilverBulletII. Hacks ALL Rivals that are in either coordinate of a
+  chosen location, including the Hacker themself (which implies that they should
+  not choose a location in their own view). Ejects the Hacker if nobody is
+  Hacked.
+  1SHOT VRARE
+SectorReboot
+  Changes all holes and spaces that contain Programs within the Hacker's view to
+  empty spaces.
+  ONDEM NORM
+GridReboot
+  Similar to SectorReboot. Changes ALL holes and spaces that contain Programs
+  to empty spaces.
+  ONDEM VRARE
+BirdsEye
+  Reveals the locations of all Programs and holes within the Hacker's view.
+  ONDEM NORM
+BirdsEyeII
+  Similar to BirdsEye. Announces the locations of ALL Programs, unless the
+  Hacker has Rootkit, in which case it REVEALS them instead.
+  ONDEM RARE
+EagleEye
+  Similar to BirdsEyeII. Announces every Hacker's location. Requires Rootkit.
+  ONDEM VRARE
+ESC
+  Moves the Hacker to a random empty space. Their former location and an
+  arbitrary coordinate of their new location are announced.
+  ONDEM NORM
+ESCII
+  Similar to ESC. Moves the Hacker to a random space, acquiring any Program and
+  Hacking any Rival on that space. No location is announced.
+  ONDEM RARE
+ChaoticCorruption
+  A chosen percentage of random locations are changed to holes, removing any
+  Programs and Ejecting any Hackers on those locations.
+  1SHOT VRARE
+Tangelo
+  Changes ALL free spaces to holes. This is bad. Requires Rootkit.
+  1SHOT VRARE
+BlindFold
+  Prevents each Rival from being able to see their view for one turn.
+  PERS  NORM
+Shroomz
+  Causes each Rival to see the Hacker in an arbitrary coordinate for one turn.
+  PERS  NORM
+ShroomzII
+  Similar to Shroomz. The Hacker chooses a Rival that all other Rivals will see
+  in an arbitrary coordinate for one turn. The chosen Rival will see the Hacker
+  as if they were affected by Shroomz.
+  PERS  RARE
+TimeWarp
+  Gives the Hacker another turn immediately.
+  1SHOT NORM
+TimeWarpII
+  Similar to Timewarp. Allows the Hacker to take as many turns as they want, but
+  they will not be able to see where they are going. Landing on a Hacker, hole,
+  or another program stops the Hacker.
+  1SHOT VRARE
+Dynamite
+  Changes every location in a chosen coordinate of the Hacker's view to holes,
+  removing Programs and Ejecting Rivals in the path. The Hacker themself is
+  left unaffected.
+  1SHOT NORM
+DoubleDynamite
+  Same as Dynamite, but both coordinates are affected. The Hacker is given
+  GridCloakII immediately afterwards (as there are no longer any spaces for them
+  to move into).
+  1SHOT VRARE
+IronBoots
+  On the Hacker's next turn, they will touch each location between their present
+  one and the target location. Programs are not collected on the way, but Rivals
+  are Hacked and holes can be fallen through.
+  PERS  RARE
+CrashLanding
+  When obtained, the four squares adjacent to this program are turned to holes,
+  Ejecting any Rivals.
+  1SHOT NORM
+CrashLandingII
+  Same as CrashLanding, but the four squares diagonally touching the program's
+  location are also affected for a total of eight squares turned to holes.
+  1SHOT RARE
+Bifurcator
+  Enhances the Hacker's view, allowing them to see left, right, up, and down
+  separately, instead of seeing left-right and up-down together.
+  PERS  RARE
