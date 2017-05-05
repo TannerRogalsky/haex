@@ -35,6 +35,7 @@ ShaderManager = require('lib.shader_manager')
 Base = require("base")
 Game = require("game")
 Player = require("player")
+Map = require('map')
 
 Direction = require("direction")
 

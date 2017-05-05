@@ -11,6 +11,7 @@ extern Image noiseTexture;
 extern float blockThreshold, lineThreshold;
 extern float radialScale, radialBreathingScale;
 extern float randomShiftScale;
+extern float screenTransitionRatio;
 
 vec2 radialDistortion(vec2 coord, float dist) {
   vec2 cc = coord - 0.5;
@@ -71,6 +72,8 @@ vec4 effect(vec4 color, Image tex, vec2 uv, vec2 pc) {
 
     outColor.xyz *= mask;
   }
+
+  outColor.a = (1.0 - screenTransitionRatio);
 
   return outColor;
 }

@@ -60,9 +60,10 @@ local function loadMap(fileName)
   --   toPixel = toPixel
   -- }
 
-  local width, height = 16, 16
+  local level_data = require('levels.' .. fileName)
+  local width, height = level_data.width, level_data.height
   local tile_width, tile_height = 64, 64
-  local seed = math.floor(love.math.random(math.pow(2, 53)))
+  local seed = level_data.seed or math.floor(love.math.random(math.pow(2, 53)))
   -- seed = 504852849218
   local random = love.math.newRandomGenerator(seed)
   print(string.format('Seed: %u', seed))
@@ -83,6 +84,7 @@ local function loadMap(fileName)
     start_node = longest_path[1],
     end_node = longest_path[#longest_path],
     node_graph = buildNodeGraph(grid),
+    next_level_name = level_data.next,
     toGrid = toGrid,
     toPixel = toPixel,
   }

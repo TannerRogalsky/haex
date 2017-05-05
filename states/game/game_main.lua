@@ -1,16 +1,11 @@
 local Main = Game:addState('Main')
-local loadMap = require('map.load_map')
-local createObscuringMesh = require('map.create_obscuring_mesh')
-local hsl = require('lib.hsl')
 
-function Main:enteredState()
+function Main:enteredState(map)
   love.mouse.setVisible(false)
 
-  self.map = loadMap('test1')
+  self.map = map
 
   self.collider = HC.new(128)
-
-  self.obscuring_mesh = createObscuringMesh(self.map)
   self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
 
   local Camera = require("lib/camera")
@@ -41,11 +36,6 @@ function Main:enteredState()
 
   self.t = 0
   self.scale = 4
-
-  self.seen = {}
-  for i=1,self.map.grid_height do
-    self.seen[i] = {}
-  end
 
   do
     local w, h = self.map.tile_width, self.map.tile_height
@@ -107,8 +97,21 @@ function Main:update(dt)
 
   self.player:update(dt)
 
-  for shape,delta in pairs(self.collider:collisions(self.player.collider)) do
-    print(shape)
+  local is_ending = false
+  for shape, delta in pairs(self.collider:collisions(self.player.collider)) do
+    if shape == self.end_collider then
+      if self.start_end_sequence_t == nil then
+        self.start_end_sequence_t = self.t
+        is_ending = true
+      else
+        is_ending = true
+      end
+    end
+  end
+  if not is_ending then
+    self.start_end_sequence_t = nil
+  elseif (self.t - self.start_end_sequence_t) >= math.pi then
+    self:gotoState('TransitionToNextLevel')
   end
 
   do
@@ -117,26 +120,26 @@ function Main:update(dt)
       for i=1,5 do
         local sx = math.clamp(1, x, self.map.grid_width)
         local sy = math.clamp(1, y - 3 + i, self.map.grid_height)
-        self.seen[sy][sx] = true
+        self.map.seen[sy][sx] = true
       end
       for i=1,5 do
         local sx = math.clamp(1, x - 3 + i, self.map.grid_width)
         local sy = math.clamp(1, y, self.map.grid_height)
-        self.seen[sy][sx] = true
+        self.map.seen[sy][sx] = true
       end
       for dy=-1,1 do
         for dx=-1,1 do
           local sx = math.clamp(1, x + dx, self.map.grid_width)
           local sy = math.clamp(1, y + dy, self.map.grid_height)
-          self.seen[sy][sx] = true
+          self.map.seen[sy][sx] = true
         end
       end
     else
       for i=1,self.map.grid_height do
-        self.seen[i][x] = true
+        self.map.seen[i][x] = true
       end
       for i=1,self.map.grid_width do
-        self.seen[y][i] = true
+        self.map.seen[y][i] = true
       end
     end
   end
@@ -145,32 +148,6 @@ function Main:update(dt)
   if love.keyboard.isDown('down') then moveToGrid(self.map, self.player, 0, 1) end
   if love.keyboard.isDown('left') then moveToGrid(self.map, self.player, -1, 0) end
   if love.keyboard.isDown('right') then moveToGrid(self.map, self.player, 1, 0) end
-end
-
-local function staleViewStencil()
-  local w, h = game.map.tile_width, game.map.tile_height
-  local seen = game.seen
-  for y=1,game.map.grid_height do
-    for x=1,game.map.grid_width do
-      if seen[y][x] then
-        g.rectangle('fill', (x - 1) * w, (y - 1) * h, w, h)
-      end
-    end
-  end
-end
-
-local function activeViewStencil()
-  local gx, gy = game.player:gridPosition()
-  local px, py = game.map:toPixel(gx, gy)
-  local w, h = game.map.tile_width, game.map.tile_height
-  if game.area_based_detection then
-    g.rectangle('fill', px - w * 2, py, w * 5, h)
-    g.rectangle('fill', px, py - h * 2, w, h * 5)
-    g.rectangle('fill', px - w, py - h, w * 3, h * 3)
-  else
-    g.rectangle('fill', 0, py, w * game.map.grid_width, h)
-    g.rectangle('fill', px, 0, w, h * game.map.grid_height)
-  end
 end
 
 function Main:draw()
@@ -188,33 +165,13 @@ function Main:draw()
   end
   self.camera:setScale(self.scale, self.scale)
 
-  if self.use_grayscale then g.setShader(self.grayscale.instance) end
-  g.stencil(staleViewStencil, 'replace', 1)
-  g.setStencilTest('greater', 0)
-  g.setColor(hsl(0, 1, 0.5 + math.sin(self.t) * 0.1))
-  g.draw(self.map.batch)
-
-  g.setStencilTest('equal', 0)
-  g.setColor(255, 255, 255)
-  g.push('all')
-  g.setShader(self.obscuring_mesh_shader.instance)
-  g.draw(self.obscuring_mesh)
-  g.pop()
-
-  g.setColor(255, 255, 255)
-  g.stencil(activeViewStencil, 'replace', 1)
-  g.setStencilTest('greater', 0)
-  g.draw(self.map.batch)
-
-  g.setShader()
-  if self.debug then
-    g.setColor(0, 255, 0, 150)
-    self.end_collider:draw('fill')
-  end
-
-  g.setStencilTest()
-
+  self.map:draw()
   self.player:draw()
+
+  if self.start_end_sequence_t then
+    local t = self.t - self.start_end_sequence_t
+    g.circle('line', self.player.x, self.player.y, math.pow(math.sin(t), 2) * push:getWidth() * 2)
+  end
   if self.debug then
     g.setColor(255, 0, 0, 150)
     self.player.collider:draw('fill')
@@ -272,7 +229,6 @@ function Main:focus(has_focus)
 end
 
 function Main:exitedState()
-  self.camera = nil
 end
 
 return Main

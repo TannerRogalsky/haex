@@ -1,4 +1,5 @@
 local Loading = Game:addState('Loading')
+local loadMap = require('map.load_map')
 
 local function generate_numbers(quant)
   local numbers = {}
@@ -37,7 +38,7 @@ function Loading:enteredState()
     -- loader finished callback
     -- initialize game stuff here
 
-    self:gotoState("Main")
+    self:gotoState("Main", Map:new('level1'))
   end)
 
   local hexFormatStringPart = '%X '
