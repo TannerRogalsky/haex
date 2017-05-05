@@ -23,17 +23,14 @@ function TestMap:enteredState()
   self.random = love.math.newRandomGenerator(self.seed)
   print(string.format('Seed: %u', self.seed))
   local grid = growingTree(width, height, {random = 1, newest = 1}, self.random)
-  -- grid = symmetricalize(grid, 'both')
 
   self.grid = grid
   self.width, self.height = #self.grid[1], #self.grid
   connectNeighboringDeadEnds(self.grid)
 
-  -- applyNotCornerBit(self.grid)
-
   self.longest_path = findLongestPath(self.grid)
 
-  self.spritebatch = buildSpriteBatch(self.grid, self.width, self.height)
+  self.spritebatch = buildSpriteBatch(self.grid, self.width, self.height, push:getWidth() / self.width, push:getHeight() / self.height)
 end
 
 function TestMap:update(dt)

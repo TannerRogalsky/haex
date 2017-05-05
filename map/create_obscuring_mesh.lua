@@ -15,10 +15,10 @@ return function(map)
   for y=1,map.grid_height do
     for x=1,map.grid_width do
       local index = #vertices
-      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 0, y + 0)), 0, 0))
-      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 0, y + 1)), 0, 1))
-      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 1, y + 1)), 1, 1))
-      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 1, y + 0)), 1, 0))
+      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 0, y + 0)), x - 1 + 0, y - 1 + 0))
+      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 0, y + 1)), x - 1 + 0, y - 1 + 1))
+      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 1, y + 1)), x - 1 + 1, y - 1 + 1))
+      table.insert(vertices, setUV(setPosition({}, map:toPixel(x + 1, y + 0)), x - 1 + 1, y - 1 + 0))
 
       table.insert(indices, index + 1)
       table.insert(indices, index + 2)

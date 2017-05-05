@@ -37,7 +37,7 @@ function Loading:enteredState()
     -- loader finished callback
     -- initialize game stuff here
 
-    self:gotoState("TestMap")
+    self:gotoState("Main")
   end)
 
   local hexFormatStringPart = '%X '

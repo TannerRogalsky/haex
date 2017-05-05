@@ -9,11 +9,12 @@ vec4 position(mat4 transform_projection, vec4 vertex_position) {
 extern float elapsed;
 extern Image noiseTexture;
 extern float blockThreshold, lineThreshold;
-extern float radialScale;
+extern float radialScale, radialBreathingScale;
+extern float randomShiftScale;
 
 vec2 radialDistortion(vec2 coord, float dist) {
   vec2 cc = coord - 0.5;
-  dist = dot(cc, cc * radialScale) * dist + cos(elapsed * .3) * .01;
+  dist = dot(cc, cc * radialScale) * dist + cos(elapsed * .3) * radialBreathingScale;
   return (coord + cc * (1.0 + dist) * dist);
 }
 
@@ -24,6 +25,10 @@ vec4 effect(vec4 color, Image tex, vec2 uv, vec2 pc) {
 
   float block_thresh = pow(fract(elapsed * 1236.0453), 2.0) * blockThreshold;
   float line_thresh = pow(fract(elapsed * 2236.0453), 3.0) * lineThreshold;
+
+  // if (Texel(noiseTexture, uv_noise).g < block_thresh)
+    // uv.x += sin(uv.y * 3.14 * 4.0 + elapsed) * 0.01;
+  uv.x += fract(sin(uv.y * 12000.0 + elapsed)) * randomShiftScale;
 
   vec2 uv_r = uv, uv_g = uv, uv_b = uv;
 

@@ -1,6 +1,7 @@
 local Main = Game:addState('Main')
 local loadMap = require('map.load_map')
 local createObscuringMesh = require('map.create_obscuring_mesh')
+local hsl = require('lib.hsl')
 
 function Main:enteredState()
   love.mouse.setVisible(false)
@@ -12,7 +13,7 @@ function Main:enteredState()
 
   local Camera = require("lib/camera")
   self.camera = Camera:new()
-  g.setFont(self.preloaded_fonts["04b03_16"])
+  g.setFont(self.preloaded_fonts["04b03_14"])
 
   self.grayscale = ShaderManager:load('grayscale', 'shaders/grayscale.glsl')
 
@@ -23,7 +24,15 @@ function Main:enteredState()
   -- lower values than these seem to result in no visible distortion
   self.aesthetic:send('blockThreshold', 0.073)
   self.aesthetic:send('lineThreshold', 0.23)
+  self.aesthetic:send('randomShiftScale', 0.001)
   self.aesthetic:send('radialScale', 1.0)
+  self.aesthetic:send('radialBreathingScale', 0.01)
+
+  -- self.aesthetic:send('blockThreshold', 0)
+  -- self.aesthetic:send('lineThreshold', 0)
+  -- self.aesthetic:send('randomShiftScale', 0)
+  -- self.aesthetic:send('radialScale', 0)
+  -- self.aesthetic:send('radialBreathingScale', 0)
 
   -- self.aesthetic:send('blockThreshold', 0.2)
   -- self.aesthetic:send('lineThreshold', 0.7)
@@ -37,7 +46,7 @@ function Main:enteredState()
   end
 
   do
-    local x, y = self.map:toPixel(math.floor(self.map.grid_width / 2) + 0.5, math.floor(self.map.grid_height / 2) + 0.5)
+    local x, y = self.map:toPixel(self.map.start_node.x + 0.5, self.map.start_node.y + 0.5)
     self.player = Player:new(x, y, self.map.tile_width, self.map.tile_height)
   end
   self.player_moving = false
@@ -46,22 +55,37 @@ function Main:enteredState()
     self.prevent_radial_distortion = false
     self.use_grayscale = true
     self.area_based_detection = true
+    self.shodan_text = false
   end
 
-  do
+  self.camera_should_follow = self.map.grid_width * self.map.tile_width > push:getWidth() * self.scale
+  if self.camera_should_follow then
     local b = self.camera.bounds
     b.negative_x = 0
     b.negative_y = 0
-    b.positive_x = self.map.grid_width * self.map.tile_width - push:getWidth() * self.scale
-    b.positive_y = self.map.grid_height * self.map.tile_height - push:getHeight() * self.scale
+    b.positive_x = math.max(self.map.grid_width * self.map.tile_width - push:getWidth() * self.scale, b.negative_x)
+    b.positive_y = math.max(self.map.grid_height * self.map.tile_height - push:getHeight() * self.scale, b.negative_y)
   end
 
   self.scripts = {}
   table.insert(self.scripts, coroutine.create(require('scripts.test_script'), game))
 end
 
+local function contains(list, item)
+  for _,other in ipairs(list) do
+    if item == other then return true end
+  end
+  return false
+end
+
 local function moveToGrid(map, player, dx, dy)
-  player:moveTo(player.x + dx * map.tile_width, player.y + dy * map.tile_height)
+  local gx, gy = map:toGrid(player.x, player.y)
+  local ngx, ngy = gx + dx, gy + dy
+  if ngx >= 1 and ngx <= map.grid_width and ngy >= 1 and ngy <= map.grid_width then
+    if contains(map.node_graph[gy][gx].neighbors, map.node_graph[ngy][ngx]) then
+      player:moveTo(player.x + dx * map.tile_width, player.y + dy * map.tile_height)
+    end
+  end
 end
 
 function Main:update(dt)
@@ -142,8 +166,12 @@ function Main:draw()
   self.camera:set()
 
   local px, py = self.player.x, self.player.y
-  do
+  if self.camera_should_follow then
     local x, y = px - push:getWidth() * self.scale / 2, py - push:getHeight() * self.scale / 2
+    self.camera:setPosition(math.floor(x), math.floor(y))
+  else
+    local x = self.map.grid_width * self.map.tile_width / 2 - push:getWidth() / 2 * self.scale
+    local y = self.map.grid_height * self.map.tile_height / 2 - push:getHeight() / 2 * self.scale
     self.camera:setPosition(math.floor(x), math.floor(y))
   end
   self.camera:setScale(self.scale, self.scale)
@@ -151,7 +179,7 @@ function Main:draw()
   if self.use_grayscale then g.setShader(self.grayscale.instance) end
   g.stencil(staleViewStencil, 'replace', 1)
   g.setStencilTest('greater', 0)
-  g.setColor(100, 100, 100)
+  g.setColor(hsl(0, 1, 0.5 + math.sin(self.t) * 0.1))
   g.draw(self.map.batch)
 
   g.setStencilTest('equal', 0)
@@ -179,6 +207,16 @@ function Main:draw()
     g.line(0, 0, 0, push:getHeight(), push:getWidth(), push:getHeight(), push:getWidth(), 0, 0, 0)
     g.pop()
   end
+
+  if self.shodan_text then
+    local w, h = push:getDimensions()
+    g.setColor(255, 75, 50)
+    g.print('LOOK AT YOU, HACKER', w * 0.1, h * 0.1)
+    g.print('A PATHETIC CREATURE OF \n        MEAT AND BONE', w * 0.15, h * 0.3)
+    g.print('    PANTING AND SWEATING AS \nYOU RUN THROUGH MY CORRIDORS', w * 0.0, h * 0.5)
+    g.print('HOW CAN YOU CHALLENGE A \n    PERFECT, \n         IMMORTAL \n                  MACHINE?', w * 0.1, h * 0.7)
+  end
+
   push:finish(game.aesthetic.instance)
 end
 
@@ -195,6 +233,8 @@ function Main:keypressed(key, scancode, isrepeat)
     self.prevent_radial_distortion = not self.prevent_radial_distortion
   elseif key == 'f2' then
     self.use_grayscale = not self.use_grayscale
+  elseif key == 'f3' then
+    self.shodan_text = not self.shodan_text
   end
 end
 

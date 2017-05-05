@@ -66,17 +66,17 @@ local function getViewport(quad, texture)
   return qx / w, qy / h, qw / w, qh / h
 end
 
-local function buildSpriteBatch(grid, width, height)
+local function buildSpriteBatch(grid, grid_width, grid_height, tile_width, tile_height)
   local sprites = require('images.sprites')
-  local w, h = push:getWidth() / width, push:getHeight() / height
+  local w, h = tile_width, tile_height
   local indices = {}
   local vertices = {}
   local px, py
 
   local index = 0
-  for y=1,height do
+  for y=1,grid_height do
     py = (y - 1) * h
-    for x=1,width do
+    for x=1,grid_width do
       px = (x - 1) * w
       -- print(x, y)
       local bits = grid[y][x]
