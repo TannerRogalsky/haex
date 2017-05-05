@@ -19,11 +19,12 @@ function Map:initialize(file_name)
   -- seed = 504852849218
   local random = love.math.newRandomGenerator(seed)
   print(string.format('Seed: %u', seed))
-  local grid = growingTree(width, height, {random = 1, newest = 1}, random)
-
-  connectNeighboringDeadEnds(grid)
-
-  local longest_path = findLongestPath(grid)
+  local grid, longest_path
+  repeat
+    grid = growingTree(width, height, {random = 1, newest = 1}, random)
+    connectNeighboringDeadEnds(grid)
+    longest_path = findLongestPath(grid)
+  until(#longest_path >= width * 1.5)
   local spritebatch = buildSpriteBatch(grid, width, height, tile_width, tile_height)
 
   self.grid_width = width
@@ -34,7 +35,7 @@ function Map:initialize(file_name)
   self.start_node = longest_path[1]
   self.end_node = longest_path[#longest_path]
   self.node_graph = buildNodeGraph(grid)
-  self.next_level_name = level_data.next
+  self.next_level_name = level_data.next or 'level1'
 
   self.obscuring_mesh = createObscuringMesh(self)
 
