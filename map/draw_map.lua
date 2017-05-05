@@ -14,7 +14,7 @@ local function staleViewStencil()
 end
 
 local function activeViewStencil()
-  local gx, gy = game.player:gridPosition()
+  local gx, gy = map.player:gridPosition()
   local px, py = map:toPixel(gx, gy)
   local w, h = map.tile_width, map.tile_height
   if game.area_based_detection then

@@ -4,6 +4,7 @@ function Main:enteredState(map)
   love.mouse.setVisible(false)
 
   self.map = map
+  self.player = map.player
 
   self.collider = HC.new(128)
   self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
@@ -38,10 +39,8 @@ function Main:enteredState(map)
   self.scale = 4
 
   do
-    local w, h = self.map.tile_width, self.map.tile_height
     local x, y = self.map:toPixel(self.map.start_node.x + 0.5, self.map.start_node.y + 0.5)
-    self.player = Player:new(x, y, w, h)
-    w, h = w * 0.9, h * 0.9
+    local w, h = self.map.tile_width * 0.9, self.map.tile_height * 0.9
     self.player.collider = self.collider:rectangle(x - w / 2, y - h / 2, w, h)
   end
   do

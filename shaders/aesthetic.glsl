@@ -29,7 +29,7 @@ vec4 effect(vec4 color, Image tex, vec2 uv, vec2 pc) {
 
   // if (Texel(noiseTexture, uv_noise).g < block_thresh)
     // uv.x += sin(uv.y * 3.14 * 4.0 + elapsed) * 0.01;
-  uv.x += fract(sin(uv.y * 12000.0 + elapsed)) * randomShiftScale;
+  uv.x += fract(sin(uv.y * 12000.0 + elapsed)) * (randomShiftScale + screenTransitionRatio * 15.0);
 
   vec2 uv_r = uv, uv_g = uv, uv_b = uv;
 

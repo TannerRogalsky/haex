@@ -7,6 +7,8 @@ local connectNeighboringDeadEnds = require('map.connect_neighboring_dead_ends')
 local buildNodeGraph = require('map.build_node_graph')
 local drawMap = require('map.draw_map')
 
+local createPlayer = require('create_player')
+
 function Map:initialize(file_name)
   Base.initialize(self)
 
@@ -40,6 +42,8 @@ function Map:initialize(file_name)
   for i=1,self.grid_height do
     self.seen[i] = {}
   end
+
+  self.player = createPlayer(self)
 end
 
 function Map:toGrid(x, y)

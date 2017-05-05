@@ -33,12 +33,15 @@ function TransitionToNextLevel:draw()
     end
     self.camera:setScale(self.scale, self.scale)
 
-    if ratio < 0.5 then
-      self.map:draw()
-      self.player:draw()
-    else
-      self.next_map:draw()
-    end
+
+    rendering_map:draw()
+    rendering_map.player:draw()
+    -- if ratio < 0.5 then
+    --   self.map:draw()
+    --   self.player:draw()
+    -- else
+    --   self.next_map:draw()
+    -- end
 
     self.aesthetic:send('screenTransitionRatio', math.pow(math.sin(ratio * math.pi), 2))
 
