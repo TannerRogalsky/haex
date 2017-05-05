@@ -8,6 +8,8 @@ function Main:enteredState()
 
   self.map = loadMap('test1')
 
+  self.collider = HC.new(128)
+
   self.obscuring_mesh = createObscuringMesh(self.map)
   self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
 
@@ -46,10 +48,16 @@ function Main:enteredState()
   end
 
   do
+    local w, h = self.map.tile_width, self.map.tile_height
     local x, y = self.map:toPixel(self.map.start_node.x + 0.5, self.map.start_node.y + 0.5)
-    self.player = Player:new(x, y, self.map.tile_width, self.map.tile_height)
+    self.player = Player:new(x, y, w, h)
+    w, h = w * 0.9, h * 0.9
+    self.player.collider = self.collider:rectangle(x - w / 2, y - h / 2, w, h)
   end
-  self.player_moving = false
+  do
+    local x, y = self.map:toPixel(self.map.end_node.x, self.map.end_node.y)
+    self.end_collider = self.collider:rectangle(x, y, self.map.tile_width, self.map.tile_height)
+  end
 
   do -- feature flags
     self.prevent_radial_distortion = false
@@ -98,6 +106,10 @@ function Main:update(dt)
   end
 
   self.player:update(dt)
+
+  for shape,delta in pairs(self.collider:collisions(self.player.collider)) do
+    print(shape)
+  end
 
   do
     local x, y = self.player:gridPosition()
@@ -194,10 +206,19 @@ function Main:draw()
   g.setStencilTest('greater', 0)
   g.draw(self.map.batch)
 
-  g.setStencilTest()
   g.setShader()
+  if self.debug then
+    g.setColor(0, 255, 0, 150)
+    self.end_collider:draw('fill')
+  end
+
+  g.setStencilTest()
 
   self.player:draw()
+  if self.debug then
+    g.setColor(255, 0, 0, 150)
+    self.player.collider:draw('fill')
+  end
 
   self.camera:unset()
   if self.prevent_radial_distortion then -- black outline prevent distortion from radial shift
