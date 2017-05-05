@@ -39,12 +39,24 @@ function Map:initialize(file_name)
 
   self.obscuring_mesh = createObscuringMesh(self)
 
+  self.collider = HC.new(128)
+
   self.seen = {}
   for i=1,self.grid_height do
     self.seen[i] = {}
   end
 
-  self.player = createPlayer(self)
+  do
+    self.player = createPlayer(self)
+    local x, y = self:toPixel(self.start_node.x + 0.5, self.start_node.y + 0.5)
+    local w, h = self.tile_width * 0.9, self.tile_height * 0.9
+    self.player.collider = self.collider:rectangle(x - w / 2, y - h / 2, w, h)
+  end
+
+  do
+    local x, y = self:toPixel(self.end_node.x, self.end_node.y)
+    self.end_collider = self.collider:rectangle(x, y, self.tile_width, self.tile_height)
+  end
 end
 
 function Map:toGrid(x, y)

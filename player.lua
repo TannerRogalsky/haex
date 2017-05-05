@@ -6,10 +6,14 @@ function Player:initialize(x, y, w, h)
   self.x, self.y = x, y
   self.w, self.h = w, h
   self.t = 0
+
+  self.dead = false
 end
 
 function Player:moveTo(tx, ty)
-  self:gotoState('Moving', tx, ty)
+  if self.dead == false then
+    self:gotoState('Moving', tx, ty)
+  end
 end
 
 function Player:update(dt)

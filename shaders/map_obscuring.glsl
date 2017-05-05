@@ -6,6 +6,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_position) {
 
 #ifdef PIXEL
 extern float elapsed;
+extern vec2 grid_dimensions;
 
 float hash(vec2 p) {
     p = 50.0*fract( p*0.3183099 + vec2(0.71,0.113));
@@ -42,11 +43,7 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 screen_coords) {
   f += 0.1250*noise(uv); uv = m*uv;
   f += 0.0625*noise(uv); uv = m*uv;
 
-  // float l = texture_coords.x;
-  // float c = 1.0 - (pow(l, 5.0) + pow(1.0 - l, 5.0));
-
-  // vec4 texturecolor = Texel(texture, texture_coords) - vec4(vec3(f), 0.0);
-
+  // float c = 1.0 - pct * (1.0 - min(1.0, f * 1.5) * Texel(texture, tc / grid_dimensions).r);
   float c = 1.0 - pct * (1.0 - f);
   return color * vec4(vec3(c), 1.0);
 }

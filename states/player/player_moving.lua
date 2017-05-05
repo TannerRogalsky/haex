@@ -1,5 +1,6 @@
 local Moving = Player:addState('Moving')
 local TIME_TO_MOVE = 0.2
+Player.static.TIME_TO_MOVE = TIME_TO_MOVE
 
 local function setCollider(collider, x, y, w, h)
   collider:moveTo(x, y)
@@ -9,6 +10,10 @@ function Moving:enteredState(tx, ty)
   self.start_x, self.start_y = self.x, self.y
   self.tx, self.ty = tx, ty
   self.start_t = self.t
+
+  for id,enemy in pairs(GridRandom.instances) do
+    enemy:move(TIME_TO_MOVE)
+  end
 end
 
 function Moving:moveTo(tx, ty)

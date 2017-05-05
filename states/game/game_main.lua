@@ -6,7 +6,6 @@ function Main:enteredState(map)
   self.map = map
   self.player = map.player
 
-  self.collider = HC.new(128)
   self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
 
   local Camera = require("lib/camera")
@@ -35,18 +34,11 @@ function Main:enteredState(map)
   -- self.aesthetic:send('blockThreshold', 0.2)
   -- self.aesthetic:send('lineThreshold', 0.7)
 
+  self.enemies = {}
+  table.insert(self.enemies, GridRandom:new(self.map, 0, 64, 64, 64))
+
   self.t = 0
   self.scale = 4
-
-  do
-    local x, y = self.map:toPixel(self.map.start_node.x + 0.5, self.map.start_node.y + 0.5)
-    local w, h = self.map.tile_width * 0.9, self.map.tile_height * 0.9
-    self.player.collider = self.collider:rectangle(x - w / 2, y - h / 2, w, h)
-  end
-  do
-    local x, y = self.map:toPixel(self.map.end_node.x, self.map.end_node.y)
-    self.end_collider = self.collider:rectangle(x, y, self.map.tile_width, self.map.tile_height)
-  end
 
   do -- feature flags
     self.prevent_radial_distortion = false
@@ -96,15 +88,21 @@ function Main:update(dt)
 
   self.player:update(dt)
 
+  for i,v in ipairs(self.enemies) do
+    v:update(dt)
+  end
+
   local is_ending = false
-  for shape, delta in pairs(self.collider:collisions(self.player.collider)) do
-    if shape == self.end_collider then
+  for shape, delta in pairs(self.map.collider:collisions(self.player.collider)) do
+    if shape == self.map.end_collider then
       if self.start_end_sequence_t == nil then
         self.start_end_sequence_t = self.t
         is_ending = true
       else
         is_ending = true
       end
+    elseif shape.parent and shape.parent:isInstanceOf(Enemy) then
+      self.player.dead = true
     end
   end
   if not is_ending then
@@ -168,8 +166,10 @@ function Main:draw()
   self.player:draw()
 
   if self.start_end_sequence_t then
-    local t = self.t - self.start_end_sequence_t
-    g.circle('line', self.player.x, self.player.y, math.pow(math.sin(t), 2) * push:getWidth() * 2)
+    local t = math.pow(math.sin(self.t - self.start_end_sequence_t), 2)
+    for i=1,10 do
+      g.circle('line', self.player.x, self.player.y, t * push:getWidth() * 2 / 10 * i)
+    end
   end
   if self.debug then
     g.setColor(255, 0, 0, 150)

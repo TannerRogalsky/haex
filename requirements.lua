@@ -37,6 +37,9 @@ Game = require("game")
 Player = require("player")
 Map = require('map')
 
+Enemy = require('enemies.enemy')
+GridRandom = require('enemies.grid_random')
+
 Direction = require("direction")
 
 local function require_all(directory)

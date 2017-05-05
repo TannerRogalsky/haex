@@ -38,6 +38,7 @@ return function(mapToRender)
   g.setStencilTest('equal', 0)
   g.setColor(255, 255, 255)
   g.push('all')
+  game.obscuring_mesh_shader:send('grid_dimensions', {map.grid_width, map.grid_height})
   g.setShader(game.obscuring_mesh_shader.instance)
   g.draw(map.obscuring_mesh)
   g.pop()
@@ -48,9 +49,14 @@ return function(mapToRender)
   g.draw(map.batch)
 
   g.setShader()
+
+  for i,v in ipairs(game.enemies) do
+    v:draw()
+  end
+
   if game.debug then
     g.setColor(0, 255, 0, 150)
-    game.end_collider:draw('fill')
+    map.end_collider:draw('fill')
   end
 
   g.setStencilTest()
