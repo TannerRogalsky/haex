@@ -39,6 +39,9 @@ Map = require('map')
 
 Enemy = require('enemies.enemy')
 GridRandom = require('enemies.grid_random')
+GridChase = require('enemies.grid_chase')
+GridTimerChase = require('enemies.grid_timer_chase')
+FreeChase = require('enemies.free_chase')
 
 Direction = require("direction")
 

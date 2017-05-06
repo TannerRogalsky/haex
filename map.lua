@@ -37,9 +37,9 @@ function Map:initialize(file_name)
   self.node_graph = buildNodeGraph(grid)
   self.next_level_name = level_data.next or 'level1'
 
-  self.obscuring_mesh = createObscuringMesh(self)
-
   self.collider = HC.new(128)
+
+  self.obscuring_mesh = createObscuringMesh(self)
 
   self.seen = {}
   for i=1,self.grid_height do
@@ -56,6 +56,17 @@ function Map:initialize(file_name)
   do
     local x, y = self:toPixel(self.end_node.x, self.end_node.y)
     self.end_collider = self.collider:rectangle(x, y, self.tile_width, self.tile_height)
+  end
+
+  self.enemies = {}
+  for enemyType, number in pairs(level_data.enemies) do
+    for i=1,number do
+      local x, y = self:toPixel(love.math.random(width), love.math.random(height))
+      while (x == self.start_node.x and y == self.start_node.y) do
+        x, y = self:toPixel(love.math.random(width), love.math.random(height))
+      end
+      table.insert(self.enemies, enemyType:new(self, x, y, tile_width, tile_height))
+    end
   end
 end
 

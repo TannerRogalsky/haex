@@ -34,9 +34,6 @@ function Main:enteredState(map)
   -- self.aesthetic:send('blockThreshold', 0.2)
   -- self.aesthetic:send('lineThreshold', 0.7)
 
-  self.enemies = {}
-  table.insert(self.enemies, GridRandom:new(self.map, 0, 64, 64, 64))
-
   self.t = 0
   self.scale = 4
 
@@ -88,7 +85,7 @@ function Main:update(dt)
 
   self.player:update(dt)
 
-  for i,v in ipairs(self.enemies) do
+  for i,v in ipairs(self.map.enemies) do
     v:update(dt)
   end
 

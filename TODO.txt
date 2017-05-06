@@ -1,2 +1,12 @@
 # TODO
--
+- enemies
+  - still some bugs in grid_timer_chase
+    - Error: enemies/grid_timer_chase.lua:34: attempt to index a nil value stack traceback: enemies/grid_timer_chase.lua:34: in function 'callback'
+- first three levels
+  - size
+  - enemies
+  - aesthetic settings
+- fourth level
+- death state
+- menu state
+- goal graphic

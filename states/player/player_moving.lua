@@ -11,7 +11,7 @@ function Moving:enteredState(tx, ty)
   self.tx, self.ty = tx, ty
   self.start_t = self.t
 
-  for id,enemy in pairs(GridRandom.instances) do
+  for id,enemy in pairs(game.map.enemies) do
     enemy:move(TIME_TO_MOVE)
   end
 end

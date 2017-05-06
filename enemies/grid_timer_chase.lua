@@ -1,4 +1,5 @@
-local GridRandom = class('GridRandom', Enemy):include(Stateful)
+local GridTimerChase = class('GridTimerChase', Enemy):include(Stateful)
+local findPath = require('map.find_path')
 
 local MAP_CONSTANTS = require('map.constants')
 local N, S, E, W, NEC, SEC, SWC, NWC = unpack(MAP_CONSTANTS.DIRECTIONS)
@@ -7,7 +8,7 @@ local function setCollider(collider, x, y, w, h)
   collider:moveTo(x + w / 2, y + h / 2)
 end
 
-function GridRandom:initialize(map, x, y, w, h)
+function GridTimerChase:initialize(map, x, y, w, h)
   Enemy.initialize(self)
 
   self.x, self.y = x, y
@@ -18,23 +19,29 @@ function GridRandom:initialize(map, x, y, w, h)
   self.collider.parent = self
 
   self.t = 0
+
+  self.timer = cron.every(Player.TIME_TO_MOVE * 2, function()
+    if game.player.dead == false then
+      self.move_start_time = self.t
+      self.time_to_move = Player.TIME_TO_MOVE
+
+      self.start_x, self.start_y = self.x, self.y
+      local gx, gy = self.map:toGrid(self.x, self.y)
+      local node = self.map.node_graph[gy][gx]
+
+      local px, py = self.map:toGrid(game.player.x, game.player.y)
+      local path = findPath(node, self.map.node_graph[py][px])
+      self.tx, self.ty = self.map:toPixel(path[2].x, path[2].y)
+    end
+  end)
 end
 
-function GridRandom:move(time_to_move)
-  if self.move_start_time then return end
-
-  self.move_start_time = self.t
-  self.time_to_move = time_to_move
-
-  self.start_x, self.start_y = self.x, self.y
-  local gx, gy = self.map:toGrid(self.x, self.y)
-  local node = self.map.node_graph[gy][gx]
-  local neighbor = node.neighbors[love.math.random(#node.neighbors)]
-  self.tx, self.ty = self.map:toPixel(neighbor.x, neighbor.y)
+function GridTimerChase:move(time_to_move)
 end
 
-function GridRandom:update(dt)
+function GridTimerChase:update(dt)
   self.t = self.t + dt
+  self.timer:update(dt)
 
   if self.move_start_time then
     if self.t >= self.move_start_time + self.time_to_move then
@@ -46,13 +53,14 @@ function GridRandom:update(dt)
     else
       local ratio = (self.t - self.move_start_time) / self.time_to_move
       local dx, dy = self.tx - self.start_x, self.ty - self.start_y
+      -- setCollider(self.collider, self.x, self.y, self.w, self.h)
       self.x = self.start_x + dx * ratio
       self.y = self.start_y + dy * ratio
     end
   end
 end
 
-function GridRandom:draw()
+function GridTimerChase:draw()
   if game.debug then
     g.setColor(0, 0, 255, 150)
     self.collider:draw('fill')
@@ -73,4 +81,4 @@ function GridRandom:draw()
   end
 end
 
-return GridRandom
+return GridTimerChase

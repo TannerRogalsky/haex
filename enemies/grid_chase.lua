@@ -1,4 +1,5 @@
-local GridRandom = class('GridRandom', Enemy):include(Stateful)
+local GridChase = class('GridChase', Enemy):include(Stateful)
+local findPath = require('map.find_path')
 
 local MAP_CONSTANTS = require('map.constants')
 local N, S, E, W, NEC, SEC, SWC, NWC = unpack(MAP_CONSTANTS.DIRECTIONS)
@@ -7,7 +8,7 @@ local function setCollider(collider, x, y, w, h)
   collider:moveTo(x + w / 2, y + h / 2)
 end
 
-function GridRandom:initialize(map, x, y, w, h)
+function GridChase:initialize(map, x, y, w, h)
   Enemy.initialize(self)
 
   self.x, self.y = x, y
@@ -20,7 +21,7 @@ function GridRandom:initialize(map, x, y, w, h)
   self.t = 0
 end
 
-function GridRandom:move(time_to_move)
+function GridChase:move(time_to_move)
   if self.move_start_time then return end
 
   self.move_start_time = self.t
@@ -29,11 +30,13 @@ function GridRandom:move(time_to_move)
   self.start_x, self.start_y = self.x, self.y
   local gx, gy = self.map:toGrid(self.x, self.y)
   local node = self.map.node_graph[gy][gx]
-  local neighbor = node.neighbors[love.math.random(#node.neighbors)]
-  self.tx, self.ty = self.map:toPixel(neighbor.x, neighbor.y)
+
+  local px, py = self.map:toGrid(game.player.x, game.player.y)
+  local path = findPath(node, self.map.node_graph[py][px])
+  self.tx, self.ty = self.map:toPixel(path[2].x, path[2].y)
 end
 
-function GridRandom:update(dt)
+function GridChase:update(dt)
   self.t = self.t + dt
 
   if self.move_start_time then
@@ -52,7 +55,7 @@ function GridRandom:update(dt)
   end
 end
 
-function GridRandom:draw()
+function GridChase:draw()
   if game.debug then
     g.setColor(0, 0, 255, 150)
     self.collider:draw('fill')
@@ -73,4 +76,4 @@ function GridRandom:draw()
   end
 end
 
-return GridRandom
+return GridChase

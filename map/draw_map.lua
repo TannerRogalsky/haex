@@ -30,27 +30,31 @@ end
 return function(mapToRender)
   map = mapToRender
   if game.use_grayscale then g.setShader(game.grayscale.instance) end
-  g.stencil(staleViewStencil, 'replace', 1)
-  g.setStencilTest('greater', 0)
-  g.setColor(hsl(0, 1, 0.5 + math.sin(game.t) * 0.1))
-  g.draw(map.batch)
 
-  g.setStencilTest('equal', 0)
-  g.setColor(255, 255, 255)
-  g.push('all')
-  game.obscuring_mesh_shader:send('grid_dimensions', {map.grid_width, map.grid_height})
-  g.setShader(game.obscuring_mesh_shader.instance)
-  g.draw(map.obscuring_mesh)
-  g.pop()
+  if not game.debug then
+    g.stencil(staleViewStencil, 'replace', 1)
+    g.setStencilTest('greater', 0)
+    g.setColor(hsl(0, 1, 0.5 + math.sin(game.t) * 0.1))
+    g.draw(map.batch)
 
-  g.setColor(255, 255, 255)
-  g.stencil(activeViewStencil, 'replace', 1)
-  g.setStencilTest('greater', 0)
+    g.setStencilTest('equal', 0)
+    g.setColor(255, 255, 255)
+    g.push('all')
+    game.obscuring_mesh_shader:send('grid_dimensions', {map.grid_width, map.grid_height})
+    g.setShader(game.obscuring_mesh_shader.instance)
+    g.draw(map.obscuring_mesh)
+    g.pop()
+
+    g.setColor(255, 255, 255)
+    g.stencil(activeViewStencil, 'replace', 1)
+    g.setStencilTest('greater', 0)
+  end
+
   g.draw(map.batch)
 
   g.setShader()
 
-  for i,v in ipairs(game.enemies) do
+  for i,v in ipairs(map.enemies) do
     v:draw()
   end
 
