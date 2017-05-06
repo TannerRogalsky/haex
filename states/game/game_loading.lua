@@ -32,13 +32,16 @@ function Loading:enteredState()
     end
   end
 
+  self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
+  self.grayscale = ShaderManager:load('grayscale', 'shaders/grayscale.glsl')
+  self.aesthetic = ShaderManager:load('aesthetic', 'shaders/aesthetic.glsl')
   g.setFont(self.preloaded_fonts["04b03_16"])
 
   self.loader.start(function()
     -- loader finished callback
     -- initialize game stuff here
 
-    self:gotoState("Main", Map:new('level3'))
+    self:gotoState("Main", Map:new(game.start_level or 'level1'))
   end)
 
   local hexFormatStringPart = '%X '

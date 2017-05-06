@@ -108,7 +108,7 @@
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
-            <enum type="AlgorithmSettings::SizeConstraints">AnySize</enum>
+            <enum type="AlgorithmSettings::SizeConstraints">POT</enum>
             <key>forceSquared</key>
             <true/>
             <key>maxRects</key>
@@ -199,6 +199,15 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">../source_images/enemy1_alpha.png</key>
+            <key type="filename">../source_images/enemy1_body.png</key>
+            <key type="filename">../source_images/enemy1_color.png</key>
+            <key type="filename">../source_images/enemy2_alpha.png</key>
+            <key type="filename">../source_images/enemy2_body.png</key>
+            <key type="filename">../source_images/enemy2_color.png</key>
+            <key type="filename">../source_images/enemy3_alpha.png</key>
+            <key type="filename">../source_images/enemy3_body.png</key>
+            <key type="filename">../source_images/enemy3_color.png</key>
             <key type="filename">../source_images/tile_masks/tile_280_mask.png</key>
             <key type="filename">../source_images/tile_masks/tile_281_mask.png</key>
             <key type="filename">../source_images/tile_masks/tile_282_mask.png</key>
@@ -288,6 +297,21 @@
                 <rect>16,16,32,32</rect>
                 <key>scale9Paddings</key>
                 <rect>16,16,32,32</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">../source_images/exit_alpha.png</key>
+            <key type="filename">../source_images/exit_body.png</key>
+            <key type="filename">../source_images/exit_color.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9Paddings</key>
+                <rect>8,8,16,16</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

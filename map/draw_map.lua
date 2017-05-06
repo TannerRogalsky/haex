@@ -58,9 +58,12 @@ return function(mapToRender)
     v:draw()
   end
 
-  if game.debug then
-    g.setColor(0, 255, 0, 150)
-    map.end_collider:draw('fill')
+  do
+    local x, y = map:toPixel(map.end_node.x + 0.5, map.end_node.y + 0.5)
+    local w, h = map.tile_width, map.tile_height
+    g.draw(game.goal_texture, game.goal_body_quad, x, y, game.t, 1, 1, 16, 16)
+    g.setColor(100, 255, 50)
+    g.draw(game.goal_texture, game.goal_alpha_quad, x, y, game.t, 1, 1, 16, 16)
   end
 
   g.setStencilTest()

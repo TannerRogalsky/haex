@@ -18,6 +18,10 @@ function GridChase:initialize(map, x, y, w, h)
   self.collider = map.collider:rectangle(x, y, w, h)
   self.collider.parent = self
 
+  local sprites = require('images.sprites')
+  self.texture = sprites.texture
+  self.quad = sprites.quads['enemy1_body.png']
+
   self.t = 0
 end
 
@@ -62,18 +66,7 @@ function GridChase:draw()
   end
 
   g.setColor(255, 255, 255)
-  for i=1,7 do
-    local t = (i / 7) * math.pi * 2
-    local x = math.cos(t + self.t) * self.w / 2 * (0.7 + math.sin(self.t * 2) * 0.3)
-    local y = math.sin(t + self.t) * self.h / 2 * (0.7 + math.sin(self.t * 2) * 0.3)
-
-    g.push()
-    g.translate(self.x + self.w / 2, self.y + self.h / 2)
-    g.translate(x, y)
-    g.rotate(math.atan2(y, x) - math.pi / 2)
-    g.polygon('fill', 0, -5, 5, 5, -5, 5)
-    g.pop()
-  end
+  g.draw(self.texture, self.quad, self.x, self.y, 0, 1.5, 1.5)
 end
 
 return GridChase

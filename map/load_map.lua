@@ -20,47 +20,46 @@ local function toPixel(self, x, y)
   return (x - 1) * self.tile_width, (y - 1) * self.tile_height
 end
 
-local function loadMap(fileName)
-  -- local mapData = assert(require('levels.' .. fileName))
+local function loadMap(file_name)
+  local level_data = assert(require('levels.' .. file_name))
   -- local sprites = require('images.sprites')
 
-  -- local layerData = mapData.layers[1]
-  -- local tileIndices = layerData.data
+  -- local layer_data = level_data.layers[1]
+  -- local tile_indices = layer_data.data
 
-  -- local tilesetData = mapData.tilesets[1]
-  -- local tilesetTexture = sprites.texture
-  -- local spriteBatch = g.newSpriteBatch(tilesetTexture, #tileIndices, 'static')
+  -- local tileset_data = level_data.tilesets[1]
+  -- local tileset_texture = sprites.texture
+  -- local spritebatch = g.newSpriteBatch(tileset_texture, #tile_indices, 'static')
 
-  -- local tile_width, tile_height = tilesetData.tilewidth, tilesetData.tileheight
+  -- local tile_width, tile_height = tileset_data.tilewidth, tileset_data.tileheight
   -- local quads = {}
-  -- for i,tileData in ipairs(tilesetData.tiles) do
+  -- for i,tileData in ipairs(tileset_data.tiles) do
   --   table.insert(quads, sprites.quads[fixRelativePath(tileData.image)])
   -- end
 
   -- local batch_ids = {}
-  -- for y=1,layerData.height do batch_ids[y] = {} end
+  -- for y=1,layer_data.height do batch_ids[y] = {} end
 
-  -- for i,tileIndex in ipairs(tileIndices) do
-  --   if tileIndex > 0 then
-  --     local x = ((i - 1) % layerData.width)
-  --     local y = math.floor((i - 1) / layerData.width)
-  --     local id = spriteBatch:add(quads[tileIndex], x * tile_width, y * tile_height)
+  -- for i,tile_index in ipairs(tile_indices) do
+  --   if tile_index > 0 then
+  --     local x = ((i - 1) % layer_data.width)
+  --     local y = math.floor((i - 1) / layer_data.width)
+  --     local id = spritebatch:add(quads[tile_index], x * tile_width, y * tile_height)
   --     batch_ids[y + 1][x + 1] = id
   --   end
   -- end
 
   -- return {
-  --   grid_width = layerData.width,
-  --   grid_height = layerData.height,
+  --   grid_width = layer_data.width,
+  --   grid_height = layer_data.height,
   --   tile_width = tile_width,
   --   tile_height = tile_height,
-  --   batch = spriteBatch,
+  --   batch = spritebatch,
   --   -- batch_ids = batch_ids,
   --   toGrid = toGrid,
   --   toPixel = toPixel
   -- }
 
-  local level_data = require('levels.' .. fileName)
   local width, height = level_data.width, level_data.height
   local tile_width, tile_height = 64, 64
   local seed = level_data.seed or math.floor(love.math.random(math.pow(2, 53)))

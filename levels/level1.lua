@@ -3,7 +3,10 @@ return {
   height = 4,
   next = 'level2',
   enemies = {
-    [GridRandom] = 1,
+    {
+      type = GridRandom,
+      number = 1,
+    }
   },
   seed = nil,
 }

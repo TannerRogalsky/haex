@@ -59,6 +59,7 @@ function Over:keyreleased()
 end
 
 function Over:exitedState()
+  self.aesthetic:send('screenTransitionRatio', 0)
   self.start_t = nil
 
   self.laugh_track_data = nil

@@ -2,11 +2,14 @@
 - enemies
   - still some bugs in grid_timer_chase
     - Error: enemies/grid_timer_chase.lua:34: attempt to index a nil value stack traceback: enemies/grid_timer_chase.lua:34: in function 'callback'
+  - graphics
 - first three levels
   - size
   - enemies
   - aesthetic settings
 - fourth level
-- death state
 - menu state
 - goal graphic
+- dialogue
+  - YOU SHOULD NOT HAVE COME HERE, HACKER.
+  - And the Lord God commanded the man, "You are free to eat from any tree in the garden; but you must not eat from the tree of the knowledge of good and evil, for when you eat from it you will certainly die." Genesis 2:16-17

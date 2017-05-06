@@ -1,15 +1,10 @@
-local Main = Game:addState('Main')
+local EndLevel = Game:addState('EndLevel')
 local Camera = require('lib.camera')
 
-function Main:enteredState(map)
+function EndLevel:enteredState(map)
   love.mouse.setVisible(false)
 
-  if map.scripted == true then
-    self:gotoState('EndLevel', map)
-    return
-  end
-
-  push._clearColor = {50, 50, 50, 255}
+  push._clearColor = {0, 0, 0, 0}
 
   self.map = map
   self.player = map.player
@@ -26,11 +21,6 @@ function Main:enteredState(map)
   self.aesthetic:send('randomShiftScale', 0.001)
   self.aesthetic:send('radialScale', 1.0)
   self.aesthetic:send('radialBreathingScale', 0.01)
-
-  local sprites = require('images.sprites')
-  self.goal_texture = sprites.texture
-  self.goal_body_quad = sprites.quads['exit_body.png']
-  self.goal_alpha_quad = sprites.quads['exit_alpha.png']
 
   -- self.aesthetic:send('blockThreshold', 0)
   -- self.aesthetic:send('lineThreshold', 0)
@@ -75,13 +65,13 @@ local function moveToGrid(map, player, dx, dy)
   local gx, gy = map:toGrid(player.x, player.y)
   local ngx, ngy = gx + dx, gy + dy
   if ngx >= 1 and ngx <= map.grid_width and ngy >= 1 and ngy <= map.grid_width then
-    if contains(map.node_graph[gy][gx].neighbors, map.node_graph[ngy][ngx]) then
+    -- if contains(map.node_graph[gy][gx].neighbors, map.node_graph[ngy][ngx]) then
       player:moveTo(player.x + dx * map.tile_width, player.y + dy * map.tile_height)
-    end
+    -- end
   end
 end
 
-function Main:update(dt)
+function EndLevel:update(dt)
   ShaderManager:update(dt)
   self.t = self.t + dt
 
@@ -146,13 +136,51 @@ function Main:update(dt)
     end
   end
 
+  if self.remove_level_timer == nil then
+    local all_seen = true
+    for i,v in ipairs(self.map.seen) do
+      if #v ~= self.map.grid_width then
+        all_seen = false
+      else
+        for x=1,self.map.grid_width do
+          if not self.map.seen[i][x] then
+            all_seen = false
+            break
+          end
+        end
+      end
+
+      if all_seen == false then break end
+    end
+
+    if all_seen then
+      local x, y = 1, 1
+      self.remove_level_timer = cron.every(0.05, function()
+        if y > self.map.grid_height then
+          self.remove_level_timer = false
+          return
+        end
+
+        self.map.batch:set(self.map.batch_ids[y][x], 10000, 0)
+
+        x = x + 1
+        if x > self.map.grid_width then
+          x = 1
+          y = y + 1
+        end
+      end)
+    end
+  elseif self.remove_level_timer then
+    self.remove_level_timer:update(dt)
+  end
+
   if love.keyboard.isDown('up') then moveToGrid(self.map, self.player, 0, -1) end
   if love.keyboard.isDown('down') then moveToGrid(self.map, self.player, 0, 1) end
   if love.keyboard.isDown('left') then moveToGrid(self.map, self.player, -1, 0) end
   if love.keyboard.isDown('right') then moveToGrid(self.map, self.player, 1, 0) end
 end
 
-function Main:draw()
+function EndLevel:draw()
   push:start()
   self.camera:set()
 
@@ -167,6 +195,7 @@ function Main:draw()
   end
   self.camera:setScale(self.scale, self.scale)
 
+  g.draw(game.preloaded_images['shodan.jpg'])
   self.map:draw()
   self.player:draw()
 
@@ -202,13 +231,13 @@ function Main:draw()
   push:finish(game.aesthetic.instance)
 end
 
-function Main:mousepressed(x, y, button, isTouch)
+function EndLevel:mousepressed(x, y, button, isTouch)
 end
 
-function Main:mousereleased(x, y, button, isTouch)
+function EndLevel:mousereleased(x, y, button, isTouch)
 end
 
-function Main:keypressed(key, scancode, isrepeat)
+function EndLevel:keypressed(key, scancode, isrepeat)
   if key == 'r' then
     love.event.quit('restart')
   elseif key == 'f1' then
@@ -220,19 +249,19 @@ function Main:keypressed(key, scancode, isrepeat)
   end
 end
 
-function Main:keyreleased(key, scancode)
+function EndLevel:keyreleased(key, scancode)
 end
 
-function Main:gamepadpressed(joystick, button)
+function EndLevel:gamepadpressed(joystick, button)
 end
 
-function Main:gamepadreleased(joystick, button)
+function EndLevel:gamepadreleased(joystick, button)
 end
 
-function Main:focus(has_focus)
+function EndLevel:focus(has_focus)
 end
 
-function Main:exitedState()
+function EndLevel:exitedState()
 end
 
-return Main
+return EndLevel
