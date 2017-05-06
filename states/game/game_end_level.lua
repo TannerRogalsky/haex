@@ -1,6 +1,48 @@
 local EndLevel = Game:addState('EndLevel')
 local Camera = require('lib.camera')
 
+local r = love.math.newRandomGenerator()
+local function interpString(from, to, ratio)
+  if ratio <= 0 then return from end
+  if ratio >= 1 then return to end
+
+  local steps = 80
+  r:setSeed(math.floor(ratio * steps))
+  local from_l = #from
+  local to_l = #to
+
+  if ratio < 1/3 then
+    local to_change = math.ceil(from_l * ratio * 3)
+    local s = {}
+    for i=1,to_change do
+      table.insert(s, string.char(r:random(65, 90)))
+    end
+    for i=to_change + 1,from_l do
+      table.insert(s, from:sub(i, i))
+    end
+    return table.concat(s, '')
+  elseif ratio < 2/3 then
+    local length = from_l + math.floor((to_l - from_l) * ((ratio * 3) % 1))
+    local s = {}
+    for i=1,length do
+      -- table.insert(s, string.char(r:random(48, 57))) -- lowercase
+      table.insert(s, string.char(r:random(65, 90))) -- uppercase
+    end
+    return table.concat(s, '')
+  else
+    local to_change = math.ceil(to_l * (((ratio * 3) % 1)))
+    local s = {}
+    for i=1,to_l do
+      if i > to_change then
+        table.insert(s, string.char(r:random(65, 90)))
+      else
+        table.insert(s, to:sub(i, i))
+      end
+    end
+    return table.concat(s, '')
+  end
+end
+
 function EndLevel:enteredState(map)
   love.mouse.setVisible(false)
 
@@ -38,7 +80,7 @@ function EndLevel:enteredState(map)
     self.prevent_radial_distortion = false
     self.use_grayscale = true
     self.area_based_detection = true
-    self.shodan_text = false
+    self.shodan_text = true
   end
 
   self.camera_should_follow = self.map.grid_width * self.map.tile_width > push:getWidth() * self.scale
@@ -65,9 +107,7 @@ local function moveToGrid(map, player, dx, dy)
   local gx, gy = map:toGrid(player.x, player.y)
   local ngx, ngy = gx + dx, gy + dy
   if ngx >= 1 and ngx <= map.grid_width and ngy >= 1 and ngy <= map.grid_width then
-    -- if contains(map.node_graph[gy][gx].neighbors, map.node_graph[ngy][ngx]) then
-      player:moveTo(player.x + dx * map.tile_width, player.y + dy * map.tile_height)
-    -- end
+    player:moveTo(player.x + dx * map.tile_width, player.y + dy * map.tile_height)
   end
 end
 
@@ -222,7 +262,7 @@ function EndLevel:draw()
   if self.shodan_text then
     local w, h = push:getDimensions()
     g.setColor(255, 75, 50)
-    g.print('LOOK AT YOU, HACKER', w * 0.1, h * 0.1)
+    g.print('LOOK AT YOU, ' .. interpString('MAN', 'HACKER', self.t / 5), w * 0.1, h * 0.1)
     g.print('A PATHETIC CREATURE OF \n        MEAT AND BONE', w * 0.15, h * 0.3)
     g.print('    PANTING AND SWEATING AS \nYOU RUN THROUGH MY CORRIDORS', w * 0.0, h * 0.5)
     g.print('HOW CAN YOU CHALLENGE A \n    PERFECT, \n         IMMORTAL \n                  MACHINE?', w * 0.1, h * 0.7)

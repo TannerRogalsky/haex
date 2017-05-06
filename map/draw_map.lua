@@ -58,7 +58,7 @@ return function(mapToRender)
     v:draw()
   end
 
-  do
+  if map.end_node then
     local x, y = map:toPixel(map.end_node.x + 0.5, map.end_node.y + 0.5)
     local w, h = map.tile_width, map.tile_height
     g.draw(game.goal_texture, game.goal_body_quad, x, y, game.t, 1, 1, 16, 16)
