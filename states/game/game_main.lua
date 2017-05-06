@@ -100,6 +100,7 @@ function Main:update(dt)
       end
     elseif shape.parent and shape.parent:isInstanceOf(Enemy) then
       self.player.dead = true
+      self:gotoState('Over')
     end
   end
   if not is_ending then

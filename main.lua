@@ -18,7 +18,7 @@ function love.load(args)
 
   push:setupScreen(gameWidth, gameHeight, windowWidth, windowHeight, {
     fullscreen = false,
-    clearColor = {100, 100, 100, 255}
+    clearColor = {50, 50, 50, 255}
   })
 
   game = Game:new(k_args)
