@@ -10,11 +10,11 @@ function FreeChase:initialize(map, x, y, w, h)
   Enemy.initialize(self)
 
   self.x, self.y = x, y
-  self.w, self.h = w, h
+  self.w, self.h = w * 0.5, h * 0.5
   self.rotation = 0
 
   self.map = map
-  self.collider = map.collider:rectangle(x, y, w, h)
+  self.collider = map.collider:rectangle(self.x, self.y, self.w, self.h)
   self.collider.parent = self
 
   self.t = 0
@@ -28,7 +28,7 @@ function FreeChase:update(dt)
 
   local tau = math.pi * 2
 
-  local px, py = game.player.x - 32, game.player.y - 32
+  local px, py = game.player.x - self.w / 2, game.player.y - self.h / 2
   local max_rot = MAX_ROT_PER_SECOND * dt
   local rotation = math.atan2(py - self.y, px - self.x)
   local delta_phi = ((((rotation - self.rotation) % tau) + math.pi * 3) % tau) - math.pi
@@ -43,17 +43,17 @@ function FreeChase:update(dt)
 end
 
 function FreeChase:draw()
+  g.setColor(255, 255, 255)
+  g.push()
+  g.translate(self.x + self.w / 2, self.y + self.h / 2)
+  g.rotate(self.rotation + math.pi / 2)
+  g.polygon('fill', 0, -32, 32, 32, -32, 32)
+  g.pop()
+
   if game.debug then
     g.setColor(0, 0, 255, 150)
     self.collider:draw('fill')
   end
-
-  g.setColor(255, 255, 255)
-  g.push()
-  g.translate(self.x + 32, self.y + 32)
-  g.rotate(self.rotation + math.pi / 2)
-  g.polygon('fill', 0, -32, 32, 32, -32, 32)
-  g.pop()
 end
 
 return FreeChase

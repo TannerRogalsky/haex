@@ -61,10 +61,11 @@ function Map:initialize(file_name)
   self.enemies = {}
   for enemyType, number in pairs(level_data.enemies) do
     for i=1,number do
-      local x, y = self:toPixel(love.math.random(width), love.math.random(height))
+      local x, y = random:random(width), random:random(height)
       while (x == self.start_node.x and y == self.start_node.y) do
-        x, y = self:toPixel(love.math.random(width), love.math.random(height))
+        x, y = random:random(width), random:random(height)
       end
+      x, y = self:toPixel(x, y)
       table.insert(self.enemies, enemyType:new(self, x, y, tile_width, tile_height))
     end
   end
