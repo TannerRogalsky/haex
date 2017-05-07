@@ -105,6 +105,11 @@ local function textShower(text_data)
 end
 
 function EndLevel:enteredState(map)
+  self.end_music_source = love.audio.newSource('sounds/last_level_drone.ogg')
+  self.end_music_source:setLooping(true)
+  self.end_music_source:setVolume(0.4)
+  self.end_music_source:play()
+
   game.music_source:stop()
 
   love.mouse.setVisible(false)
@@ -299,12 +304,12 @@ function EndLevel:update(dt)
       -- self.prevent_radial_distortion = true
       self.remove_level_timer = cron.every(0.02, function()
         if #all_coords == 0 then
-
           self.remove_level_timer = cron.after(1.5, function()
             self.shodan_text = true
 
             local quote_sound_data = love.sound.newSoundData('sounds/quote.ogg')
             local quote_source = love.audio.newSource(quote_sound_data)
+            self.end_music_source:setVolume(0.1)
             quote_source:play()
 
             self.aesthetic:send('blockThreshold', 0.073)
@@ -330,6 +335,7 @@ function EndLevel:update(dt)
                   g.print('DIE')
                   g.pop()
 
+                  self.end_music_source:stop()
                   game.music_source:play()
 
                   if t / 5 >= 1 then

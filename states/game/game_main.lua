@@ -102,6 +102,10 @@ function Main:update(dt)
       if self.start_end_sequence_t == nil then
         self.start_end_sequence_t = self.t
         is_ending = true
+        local warp_sound_data = love.sound.newSoundData('sounds/level_finish.ogg')
+        local warp_source = love.audio.newSource(warp_sound_data)
+        warp_source:setVolume(0.6)
+        warp_source:play()
       else
         is_ending = true
       end
