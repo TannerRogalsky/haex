@@ -1,6 +1,18 @@
 local EndLevel = Game:addState('EndLevel')
 local Camera = require('lib.camera')
 
+local function staleViewStencil()
+  local w, h = game.map.tile_width, game.map.tile_height
+  local seen = game.map.seen
+  for y=1,game.map.grid_height do
+    for x=1,game.map.grid_width do
+      if seen[y][x] then
+        g.rectangle('fill', (x - 1) * w, (y - 1) * h, w, h)
+      end
+    end
+  end
+end
+
 local function shuffle(a)
   local c = #a
   for i = 1, c do
@@ -113,8 +125,8 @@ function EndLevel:enteredState(map)
   -- self.aesthetic:send('radialScale', 0)
   -- self.aesthetic:send('radialBreathingScale', 0)
 
-  -- self.aesthetic:send('blockThreshold', 0.2)
-  -- self.aesthetic:send('lineThreshold', 0.7)
+  self.aesthetic:send('blockThreshold', 0.2)
+  self.aesthetic:send('lineThreshold', 0.7)
 
   do
     local w, h = push:getDimensions()
@@ -144,12 +156,12 @@ function EndLevel:enteredState(map)
       {function(t) return 'THE ' .. interpString('MAN', 'HACKER', t / 5) .. ',' end, w * 0.3, h * 0.1 + lh},
       {'"YOU ARE FREE TO EAT', w * 0.0, h * 0.25},
       {'FROM ANY TREE IN THE GARDEN;', w * 0.1, h * 0.25 + lh * 1},
-      {'BUT YOU MUST NOT EAT FROM', w * 0.15, h * 0.25 + lh * 2},
+      {'BUT YOU MUST NOT EAT FROM', w * 0.15, h * 0.25 + lh * 3.5},
       {'THE TREE OF THE KNOWLEDGE OF', w * 0.1, h * 0.5},
       {'GOOD AND EVIL,', w * 0.2, h * 0.5 + lh},
       {'FOR WHEN YOU EAT FROM IT', w * 0.1, h * 0.5 + lh * 2},
       {'     YOU WILL', w * 0.1, h * 0.7},
-      {'           CERTAINLY,', w * 0.1, h * 0.7 + lh * 1},
+      {'           CERTAINLY', w * 0.1, h * 0.7 + lh * 1},
       {'                ', w * 0.1, h * 0.7 + lh * 2},
       {'DIE."', self.die_text_position.x, self.die_text_position.y},
     })
@@ -157,6 +169,13 @@ function EndLevel:enteredState(map)
 
   self.t = 0
   self.scale = 4
+
+  self.enemy_positions = {
+    {x = 3, y = 3},
+    {x = 3, y = 16 - 2 - 2},
+    {x = 16 - 2 - 2, y = 16 - 2 - 2},
+    {x = 16 - 2 - 2, y = 3},
+  }
 
   do -- feature flags
     self.prevent_radial_distortion = false
@@ -211,26 +230,6 @@ function EndLevel:update(dt)
 
   for i,v in ipairs(self.map.enemies) do
     v:update(dt)
-  end
-
-  local is_ending = false
-  for shape, delta in pairs(self.map.collider:collisions(self.player.collider)) do
-    if shape == self.map.end_collider then
-      if self.start_end_sequence_t == nil then
-        self.start_end_sequence_t = self.t
-        is_ending = true
-      else
-        is_ending = true
-      end
-    elseif shape.parent and shape.parent:isInstanceOf(Enemy) then
-      self.player.dead = true
-      self:gotoState('Over')
-    end
-  end
-  if not is_ending then
-    self.start_end_sequence_t = nil
-  elseif (self.t - self.start_end_sequence_t) >= math.pi then
-    self:gotoState('TransitionToNextLevel')
   end
 
   do
@@ -294,6 +293,8 @@ function EndLevel:update(dt)
         if #all_coords == 0 then
           self.remove_level_timer = cron.after(1.5, function()
             self.shodan_text = true
+            self.aesthetic:send('blockThreshold', 0.073)
+            self.aesthetic:send('lineThreshold', 0.23)
 
             self.remove_level_timer = cron.after(self.shodan_text_shower.total_time + 2, function()
               local t = 0
@@ -314,6 +315,17 @@ function EndLevel:update(dt)
                   g.setColor(255, 75, 50)
                   g.print('DIE')
                   g.pop()
+
+                  if t / 5 >= 1 then
+                    ratio = t / 5 - 1
+                    self.aesthetic:send('blockThreshold', 0.073 + ratio * 0.927)
+                    self.aesthetic:send('lineThreshold', 0.23 + ratio * 0.77)
+                  end
+
+                  if t / 5 >= 2 then
+                    self.player.dead = true
+                    self:gotoState('Win')
+                  end
                 end
               end)
 
@@ -364,14 +376,39 @@ function EndLevel:draw()
     local w, h = push:getDimensions()
     g.draw(bg, 0, 0, 0, w / bg:getWidth() * self.scale, h / bg:getHeight() * self.scale)
   end
-  self.map:draw()
 
-  if self.shodan_text then
+  if self.use_grayscale then g.setShader(self.grayscale.instance) end
+  g.stencil(staleViewStencil, 'replace', 1)
+  g.setStencilTest('greater', 0)
+  g.draw(self.map.batch)
+  g.setShader()
+
+  if game.shodan_text then
     g.setColor(255, 0, 0)
   else
     g.setColor(255, 255, 255)
   end
-  self.player:draw()
+  game.player:draw()
+
+  g.setColor(255, 255, 255)
+  do
+    local sprites = require('images.sprites')
+    local texture, quad = sprites.texture, sprites.quads['enemy2_body.png']
+    for i,pos in ipairs(game.enemy_positions) do
+      local x, y = game.map:toPixel(pos.x, pos.y)
+      g.draw(texture, quad, x, y + math.sin(self.t + x * y) * 5, 0, 3, 3)
+    end
+  end
+
+  g.setColor(255, 255, 255)
+  g.push('all')
+  g.setStencilTest('equal', 0)
+  self.obscuring_mesh_shader:send('grid_dimensions', {self.map.grid_width, self.map.grid_height})
+  g.setShader(self.obscuring_mesh_shader.instance)
+  g.draw(self.map.obscuring_mesh)
+  g.pop()
+
+  g.setStencilTest()
 
   if self.start_end_sequence_t then
     local t = math.pow(math.sin(self.t - self.start_end_sequence_t), 2)
