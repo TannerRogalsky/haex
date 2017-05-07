@@ -43,6 +43,33 @@ local function interpString(from, to, ratio)
   end
 end
 
+local TYPEWRITER_SPEED = 12 -- characters per second
+local function lengthToShow(text, t)
+  local length = #text
+  local shown_length = math.ceil(t * TYPEWRITER_SPEED)
+  return math.min(length, shown_length)
+end
+
+local function textShower(text_data)
+  return {
+    t = 0,
+    update = function(self, dt)
+      self.t = self.t + dt
+    end,
+    draw = function(self)
+      local t = self.t
+      for i,line_data in ipairs(text_data) do
+        local text = line_data[1]
+        if is_func(text) then text = text(t) end
+        local l = lengthToShow(text, t)
+        g.print(text:sub(1, l), line_data[2], line_data[3])
+
+        t = math.max(0, t - l / TYPEWRITER_SPEED)
+      end
+    end,
+  }
+end
+
 function EndLevel:enteredState(map)
   love.mouse.setVisible(false)
 
@@ -73,6 +100,22 @@ function EndLevel:enteredState(map)
   -- self.aesthetic:send('blockThreshold', 0.2)
   -- self.aesthetic:send('lineThreshold', 0.7)
 
+  do
+    local w, h = push:getDimensions()
+    local lh = g.getFont():getHeight()
+    self.shodan_text_shower = textShower({
+      {function(t) return 'LOOK AT YOU, ' .. interpString('MAN', 'HACKER', t / 5) end, w * 0.1, h * 0.1},
+      {'A PATHETIC CREATURE OF', w * 0.15, h * 0.3},
+      {'MEAT AND BONE', w * 0.25, h * 0.3 + lh},
+      {'PANTING AND SWEATING AS', w * 0.1, h * 0.5},
+      {'YOU RUN THROUGH MY CORRIDORS', w * 0.0, h * 0.5 + lh},
+      {'HOW CAN YOU CHALLENGE A', w * 0.1, h * 0.7},
+      {'PERFECT,', w * 0.3, h * 0.7 + lh * 1},
+      {'IMMORTAL,', w * 0.4, h * 0.7 + lh * 2},
+      {'MACHINE?', w * 0.5, h * 0.7 + lh * 3},
+    })
+  end
+
   self.t = 0
   self.scale = 4
 
@@ -80,7 +123,7 @@ function EndLevel:enteredState(map)
     self.prevent_radial_distortion = false
     self.use_grayscale = true
     self.area_based_detection = true
-    self.shodan_text = true
+    self.shodan_text = false
   end
 
   self.camera_should_follow = self.map.grid_width * self.map.tile_width > push:getWidth() * self.scale
@@ -121,6 +164,10 @@ function EndLevel:update(dt)
   end
 
   self.player:update(dt)
+
+  if self.shodan_text then
+    self.shodan_text_shower:update(dt)
+  end
 
   for i,v in ipairs(self.map.enemies) do
     v:update(dt)
@@ -260,12 +307,14 @@ function EndLevel:draw()
   end
 
   if self.shodan_text then
-    local w, h = push:getDimensions()
     g.setColor(255, 75, 50)
-    g.print('LOOK AT YOU, ' .. interpString('MAN', 'HACKER', self.t / 5), w * 0.1, h * 0.1)
-    g.print('A PATHETIC CREATURE OF \n        MEAT AND BONE', w * 0.15, h * 0.3)
-    g.print('    PANTING AND SWEATING AS \nYOU RUN THROUGH MY CORRIDORS', w * 0.0, h * 0.5)
-    g.print('HOW CAN YOU CHALLENGE A \n    PERFECT, \n         IMMORTAL \n                  MACHINE?', w * 0.1, h * 0.7)
+    self.shodan_text_shower:draw()
+    -- local w, h = push:getDimensions()
+    -- g.setColor(255, 75, 50)
+    -- g.print('LOOK AT YOU, ' .. interpString('MAN', 'HACKER', self.t / 5), w * 0.1, h * 0.1)
+    -- g.print('A PATHETIC CREATURE OF \n        MEAT AND BONE', w * 0.15, h * 0.3)
+    -- g.print('    PANTING AND SWEATING AS \nYOU RUN THROUGH MY CORRIDORS', w * 0.0, h * 0.5)
+    -- g.print('HOW CAN YOU CHALLENGE A \n    PERFECT, \n         IMMORTAL \n                  MACHINE?', w * 0.1, h * 0.7)
   end
 
   push:finish(game.aesthetic.instance)
@@ -286,6 +335,12 @@ function EndLevel:keypressed(key, scancode, isrepeat)
     self.use_grayscale = not self.use_grayscale
   elseif key == 'f3' then
     self.shodan_text = not self.shodan_text
+  elseif key == 'f4' then
+    for y=1,self.map.grid_height do
+      for x=1,self.map.grid_width do
+        self.map.seen[y][x] = true
+      end
+    end
   end
 end
 
