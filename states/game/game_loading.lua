@@ -79,6 +79,10 @@ function Loading:enteredState()
       self.numbers_text:add(string.format(numbers_string, unpack(numbers[i + 1])), 0, lineHeight * i)
     end
   end)
+
+  self.music_source = love.audio.newSource('sounds/music.ogg')
+  self.music_source:setLooping(true)
+  self.music_source:play()
 end
 
 function Loading:draw()
