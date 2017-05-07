@@ -112,11 +112,12 @@ function Main:update(dt)
     elseif shape.parent and shape.parent:isInstanceOf(Enemy) then
       self.player.dead = true
       self:gotoState('Over')
+      return
     end
   end
   if not is_ending then
     self.start_end_sequence_t = nil
-  elseif (self.t - self.start_end_sequence_t) >= math.pi then
+  elseif self.start_end_sequence_t and (self.t - self.start_end_sequence_t) >= math.pi then
     self:gotoState('TransitionToNextLevel')
   end
 
