@@ -141,6 +141,9 @@ function EndLevel:enteredState(map)
   self.aesthetic:send('blockThreshold', 0.2)
   self.aesthetic:send('lineThreshold', 0.7)
 
+  self.remove_level_timer = nil
+  self.transition_death_text = nil
+
   do
     local w, h = push:getDimensions()
     local lh = g.getFont():getHeight()
