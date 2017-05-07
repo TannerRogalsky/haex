@@ -18,13 +18,13 @@ function Menu:enteredState()
 
   local sprites = require('images.sprites')
 
-  self.mesh = g.newMesh({
+  self.menu_mesh = g.newMesh({
     {0, 0, 0, 0},
     {0, 1, 0, 1},
     {1, 1, 1, 1},
     {1, 0, 1, 0},
   }, 'fan', 'static')
-  self.mesh:setTexture(self.preloaded_images['boss_contrast.png'])
+  self.menu_mesh:setTexture(self.preloaded_images['boss_contrast.png'])
 end
 
 function Menu:update(dt)
@@ -36,7 +36,7 @@ function Menu:draw()
   push:start()
   local w, h = push:getDimensions()
   g.setShader(self.menu_shader.instance)
-  g.draw(self.mesh, 0, 0, 0, w , h)
+  g.draw(self.menu_mesh, 0, 0, 0, w , h)
   g.setShader()
 
   g.translate(w / 2 , h / 2)
@@ -57,19 +57,40 @@ function Menu:draw()
     table.insert(coords, y)
   end
   g.push('all')
-    g.setLineWidth(3)
-    g.setLineJoin('bevel')
+    g.setLineWidth(6)
+    -- g.setLineJoin('bevel')
     g.translate(0, 0)
     g.setColor(0, 0, 0, 200)
     g.line(coords)
   g.pop()
 
-  do
-    local text = 'HA  EX'
-    local tw, th = g.getFont():getWidth(text), g.getFont():getHeight()
-    g.setColor(255, 75, 50, 100)
-    g.print(text, 0 - tw / 2, 0 - th / 2)
-  end
+  g.push()
+    g.translate(0, -10)
+    do
+      -- local text = 'HA  EX'
+      -- local tw, th = g.getFont():getWidth(text), g.getFont():getHeight()
+      -- g.setColor(255, 75, 50, 100)
+      -- g.print(text, 0 - tw / 2, 0 - th / 2)
+      local text = game.preloaded_images['title_title.png']
+      local tw, th = text:getDimensions()
+      g.draw(text, -tw / 2, h / 4)
+    end
+
+    do
+      local arrows = game.preloaded_images['title_arrow.png']
+      local tw, th = arrows:getDimensions()
+      g.draw(arrows, -tw / 2, h / 2 - th * 1.5)
+    end
+
+    for i,v in ipairs({'title_kyle_white.png', 'title_ryan_white.png', 'title_tanner_white.png'}) do
+      local name = game.preloaded_images[v]
+      local tw, th = name:getDimensions()
+      g.push()
+      g.scale(0.5)
+        g.draw(name, (i - 2) * w / 2 - tw / 2, h - th)
+      g.pop()
+    end
+  g.pop()
 
   push:finish(self.aesthetic.instance)
 end
