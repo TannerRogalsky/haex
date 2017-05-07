@@ -1,6 +1,7 @@
 return {
   width = 16,
   height = 16,
+  next = 'level4',
   enemies = {
     {
       type = GridRandom,

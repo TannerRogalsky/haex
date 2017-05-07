@@ -168,6 +168,7 @@ function Main:draw()
   self.camera:setScale(self.scale, self.scale)
 
   self.map:draw()
+  g.setColor(255, 255, 255)
   self.player:draw()
 
   if self.start_end_sequence_t then

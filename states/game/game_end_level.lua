@@ -1,6 +1,15 @@
 local EndLevel = Game:addState('EndLevel')
 local Camera = require('lib.camera')
 
+local function shuffle(a)
+  local c = #a
+  for i = 1, c do
+    local ndx0 = love.math.random(1, c)
+    a[ndx0], a[i] = a[i], a[ndx0]
+  end
+  return a
+end
+
 local r = love.math.newRandomGenerator()
 local function interpString(from, to, ratio)
   if ratio <= 0 then return from end
@@ -51,7 +60,14 @@ local function lengthToShow(text, t)
 end
 
 local function textShower(text_data)
+  local total_time = 0
+  for i,line_data in ipairs(text_data) do
+    local text = line_data[1]
+    if is_func(text) then text = text(1) end
+    total_time = total_time + #text / TYPEWRITER_SPEED
+  end
   return {
+    total_time = total_time,
     t = 0,
     update = function(self, dt)
       self.t = self.t + dt
@@ -116,6 +132,29 @@ function EndLevel:enteredState(map)
     })
   end
 
+  do
+    local w, h = push:getDimensions()
+    local lh = g.getFont():getHeight()
+    self.die_text_position = {
+      x = w * 0.5,
+      y = h * 0.7 + lh * 2
+    }
+    self.shodan_text_shower = textShower({
+      {'AND THE LORD GOD COMMANDED', w * 0.1, h * 0.1},
+      {function(t) return 'THE ' .. interpString('MAN', 'HACKER', t / 5) .. ',' end, w * 0.3, h * 0.1 + lh},
+      {'"YOU ARE FREE TO EAT', w * 0.0, h * 0.25},
+      {'FROM ANY TREE IN THE GARDEN;', w * 0.1, h * 0.25 + lh * 1},
+      {'BUT YOU MUST NOT EAT FROM', w * 0.15, h * 0.25 + lh * 2},
+      {'THE TREE OF THE KNOWLEDGE OF', w * 0.1, h * 0.5},
+      {'GOOD AND EVIL,', w * 0.2, h * 0.5 + lh},
+      {'FOR WHEN YOU EAT FROM IT', w * 0.1, h * 0.5 + lh * 2},
+      {'     YOU WILL', w * 0.1, h * 0.7},
+      {'           CERTAINLY,', w * 0.1, h * 0.7 + lh * 1},
+      {'                ', w * 0.1, h * 0.7 + lh * 2},
+      {'DIE."', self.die_text_position.x, self.die_text_position.y},
+    })
+  end
+
   self.t = 0
   self.scale = 4
 
@@ -156,6 +195,7 @@ end
 
 function EndLevel:update(dt)
   ShaderManager:update(dt)
+  self.dt = dt
   self.t = self.t + dt
 
   for index,script in pairs(self.scripts) do
@@ -242,19 +282,56 @@ function EndLevel:update(dt)
 
     if all_seen then
       local x, y = 1, 1
-      self.remove_level_timer = cron.every(0.05, function()
-        if y > self.map.grid_height then
-          self.remove_level_timer = false
+      local all_coords = {}
+      for y=1,self.map.grid_height do
+        for x=1,self.map.grid_width do
+          table.insert(all_coords, {x, y})
+        end
+      end
+      shuffle(all_coords)
+      self.prevent_radial_distortion = true
+      self.remove_level_timer = cron.every(0.02, function()
+        if #all_coords == 0 then
+          self.remove_level_timer = cron.after(1.5, function()
+            self.shodan_text = true
+
+            self.remove_level_timer = cron.after(self.shodan_text_shower.total_time + 2, function()
+              local t = 0
+              local time_to_transition = 2
+              self.remove_level_timer = cron.after(time_to_transition + 1, function()
+                local t = 0
+                local tw, th = g.getFont():getWidth('DIE'), g.getFont():getHeight()
+                local sx, sy = self.die_text_position.x, self.die_text_position.y
+                local tx, ty = push:getWidth() / 2 - tw / 2, push:getHeight() / 2 - th / 2
+                self.transition_death_text = function(dt)
+                  t = t + dt
+                  local ratio = math.min(t / 5, 1)
+                  g.push()
+                  local x = sx + (tx - sx) * ratio
+                  local y = sy + (ty - sy) * ratio
+                  g.translate(x, y)
+                  -- g.scale(1 + ratio * 30)
+                  g.setColor(255, 75, 50)
+                  g.print('DIE')
+                  g.pop()
+                end
+              end)
+
+              self.transition_death_text = function(dt)
+                t = t + dt
+                local ratio = math.min(t / time_to_transition, 1)
+                g.setColor(255, 75, 50, 255 * (1 - ratio))
+                self.shodan_text_shower:draw()
+                g.setColor(255, 75, 50)
+                g.print('DIE', self.die_text_position.x, self.die_text_position.y)
+              end
+            end)
+          end)
           return
         end
 
-        self.map.batch:set(self.map.batch_ids[y][x], 10000, 0)
-
-        x = x + 1
-        if x > self.map.grid_width then
-          x = 1
-          y = y + 1
-        end
+        local coord = table.remove(all_coords)
+        self.map.batch:set(self.map.batch_ids[coord[2]][coord[1]], 10000, 0)
       end)
     end
   elseif self.remove_level_timer then
@@ -282,8 +359,18 @@ function EndLevel:draw()
   end
   self.camera:setScale(self.scale, self.scale)
 
-  g.draw(game.preloaded_images['shodan.jpg'])
+  do
+    local bg = game.preloaded_images['shodan.jpg']
+    local w, h = push:getDimensions()
+    g.draw(bg, 0, 0, 0, w / bg:getWidth() * self.scale, h / bg:getHeight() * self.scale)
+  end
   self.map:draw()
+
+  if self.shodan_text then
+    g.setColor(255, 0, 0)
+  else
+    g.setColor(255, 255, 255)
+  end
   self.player:draw()
 
   if self.start_end_sequence_t then
@@ -307,8 +394,12 @@ function EndLevel:draw()
   end
 
   if self.shodan_text then
-    g.setColor(255, 75, 50)
-    self.shodan_text_shower:draw()
+    if self.transition_death_text then
+      self.transition_death_text(self.dt)
+    else
+      g.setColor(255, 75, 50)
+      self.shodan_text_shower:draw()
+    end
     -- local w, h = push:getDimensions()
     -- g.setColor(255, 75, 50)
     -- g.print('LOOK AT YOU, ' .. interpString('MAN', 'HACKER', self.t / 5), w * 0.1, h * 0.1)

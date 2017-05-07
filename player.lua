@@ -25,7 +25,6 @@ function Player:gridPosition()
 end
 
 function Player:draw()
-  g.setColor(255, 255, 255)
   for i=1,10 do
     local t = (i / 10 + self.t / 4) * math.pi * 2
     local x = math.cos(t) * math.cos(t * 2) * self.w / 2
