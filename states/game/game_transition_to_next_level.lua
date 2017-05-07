@@ -19,6 +19,12 @@ end
 
 function TransitionToNextLevel:draw()
   push:start()
+  local w, h = push:getDimensions()
+  g.setColor(255, 255, 255, 100)
+  g.setShader(self.menu_shader.instance)
+  g.draw(self.menu_mesh, 0, 0, 0, w , h)
+  g.setShader()
+
   self.camera:set()
   local ratio = (self.t - self.start_t) / TIME_TO_TRANSITION
   local rendering_map = ratio < 0.5 and self.map or self.next_map
