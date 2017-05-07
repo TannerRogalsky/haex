@@ -32,6 +32,6 @@ return function(map)
 
   local mesh = love.graphics.newMesh(vertices, 'triangles', 'static')
   mesh:setVertexMap(indices)
-  mesh:setTexture(game.preloaded_images['shodan.jpg'])
+  mesh:setTexture(game.preloaded_images['boss_contrast.png'])
   return mesh
 end

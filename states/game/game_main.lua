@@ -9,7 +9,7 @@ function Main:enteredState(map)
     return
   end
 
-  push._clearColor = {50, 50, 50, 255}
+  push._clearColor = {0, 0, 0, 255}
 
   self.map = map
   self.player = map.player
@@ -21,8 +21,8 @@ function Main:enteredState(map)
   self.preloaded_images['noise.png']:setWrap('repeat', 'repeat')
   self.aesthetic:send('noiseTexture', self.preloaded_images['noise.png'])
   -- lower values than these seem to result in no visible distortion
-  self.aesthetic:send('blockThreshold', 0.073)
-  self.aesthetic:send('lineThreshold', 0.23)
+  self.aesthetic:send('blockThreshold', self.map.blockThreshold or 0.073)
+  self.aesthetic:send('lineThreshold', self.map.lineThreshold or 0.23)
   self.aesthetic:send('randomShiftScale', 0.001)
   self.aesthetic:send('radialScale', 1.0)
   self.aesthetic:send('radialBreathingScale', 0.01)
@@ -150,6 +150,13 @@ function Main:update(dt)
   if love.keyboard.isDown('down') then moveToGrid(self.map, self.player, 0, 1) end
   if love.keyboard.isDown('left') then moveToGrid(self.map, self.player, -1, 0) end
   if love.keyboard.isDown('right') then moveToGrid(self.map, self.player, 1, 0) end
+
+  if self.joystick then
+    if self.joystick:isGamepadDown('dpup') then moveToGrid(self.map, self.player, 0, -1) end
+    if self.joystick:isGamepadDown('dpdown') then moveToGrid(self.map, self.player, 0, 1) end
+    if self.joystick:isGamepadDown('dpleft') then moveToGrid(self.map, self.player, -1, 0) end
+    if self.joystick:isGamepadDown('dpright') then moveToGrid(self.map, self.player, 1, 0) end
+  end
 end
 
 function Main:draw()
@@ -234,6 +241,7 @@ function Main:focus(has_focus)
 end
 
 function Main:exitedState()
+  self.start_end_sequence_t = nil
 end
 
 return Main

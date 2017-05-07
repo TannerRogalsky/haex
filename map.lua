@@ -46,6 +46,9 @@ function Map:initialize(file_name)
     self.node_graph = buildNodeGraph(grid)
     self.next_level_name = level_data.next or 'level1'
 
+    self.blockThreshold = level_data.blockThreshold
+    self.lineThreshold = level_data.lineThreshold
+
     do
       local x, y = self:toPixel(self.end_node.x, self.end_node.y)
       self.end_collider = self.collider:rectangle(x, y, self.tile_width, self.tile_height)

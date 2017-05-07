@@ -46,25 +46,17 @@ function Win:draw()
   self.camera:unset()
   self.aesthetic:send('screenTransitionRatio', ratio)
   push:finish(self.aesthetic.instance)
-
-  -- do
-  --   g.push('all')
-  --   -- g.setFont(self.preloaded_fonts["04b03_64"])
-  --   g.scale(push._SCALE)
-  --   local w, h = push:getDimensions()
-  --   g.setColor(255, 75, 50, ratio * 255)
-  --   g.print('GOODBYE...', w * 0.3, h * 0.4)
-  --   g.setColor(255, 75, 50, math.pow(ratio, 2) * 255)
-  --   g.print('...HACKER', w * 0.6, h * 0.7)
-  --   g.pop()
-  -- end
 end
 
 function Win:keyreleased()
   local ratio = math.min((self.t - self.start_t) / self.laugh_track_time, 1)
   if ratio == 1 then
-    self:gotoState('Main', Map:new('level1'))
+    self:gotoState('Menu')
   end
+end
+
+function Win:gamepadreleased()
+  self:keyreleased()
 end
 
 function Win:exitedState()

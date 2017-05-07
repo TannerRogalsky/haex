@@ -35,13 +35,20 @@ function Loading:enteredState()
   self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
   self.grayscale = ShaderManager:load('grayscale', 'shaders/grayscale.glsl')
   self.aesthetic = ShaderManager:load('aesthetic', 'shaders/aesthetic.glsl')
+  self.menu_shader = ShaderManager:load('menu', 'shaders/menu.glsl')
   g.setFont(self.preloaded_fonts["04b03_16"])
+
+  self.joystick = love.joystick.getJoysticks()[1]
 
   self.loader.start(function()
     -- loader finished callback
     -- initialize game stuff here
 
-    self:gotoState("Main", Map:new(game.start_level or 'level1'))
+    if game.start_level then
+      self:gotoState("Main", Map:new(game.start_level))
+    else
+      self:gotoState('Menu')
+    end
   end)
 
   local hexFormatStringPart = '%X '

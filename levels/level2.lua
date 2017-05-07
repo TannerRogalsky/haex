@@ -12,5 +12,7 @@ return {
       number = 1,
     },
   },
+  blockThreshold = 0.093,
+  lineThreshold = 0.33,
   seed = nil
 }

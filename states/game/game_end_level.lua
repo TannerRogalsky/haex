@@ -1,6 +1,12 @@
 local EndLevel = Game:addState('EndLevel')
 local Camera = require('lib.camera')
 
+local function getViewport(quad, texture)
+  local w, h = texture:getDimensions()
+  local qx, qy, qw, qh = quad:getViewport()
+  return qx / w, qy / h, qw / w, qh / h, qw, qh
+end
+
 local function staleViewStencil()
   local w, h = game.map.tile_width, game.map.tile_height
   local seen = game.map.seen
@@ -288,7 +294,7 @@ function EndLevel:update(dt)
         end
       end
       shuffle(all_coords)
-      self.prevent_radial_distortion = true
+      -- self.prevent_radial_distortion = true
       self.remove_level_timer = cron.every(0.02, function()
         if #all_coords == 0 then
           self.remove_level_timer = cron.after(1.5, function()
@@ -354,6 +360,13 @@ function EndLevel:update(dt)
   if love.keyboard.isDown('down') then moveToGrid(self.map, self.player, 0, 1) end
   if love.keyboard.isDown('left') then moveToGrid(self.map, self.player, -1, 0) end
   if love.keyboard.isDown('right') then moveToGrid(self.map, self.player, 1, 0) end
+
+  if self.joystick then
+    if self.joystick:isGamepadDown('dpup') then moveToGrid(self.map, self.player, 0, -1) end
+    if self.joystick:isGamepadDown('dpdown') then moveToGrid(self.map, self.player, 0, 1) end
+    if self.joystick:isGamepadDown('dpleft') then moveToGrid(self.map, self.player, -1, 0) end
+    if self.joystick:isGamepadDown('dpright') then moveToGrid(self.map, self.player, 1, 0) end
+  end
 end
 
 function EndLevel:draw()
@@ -372,9 +385,21 @@ function EndLevel:draw()
   self.camera:setScale(self.scale, self.scale)
 
   do
-    local bg = game.preloaded_images['shodan.jpg']
+    local sprites = require('images.sprites')
     local w, h = push:getDimensions()
-    g.draw(bg, 0, 0, 0, w / bg:getWidth() * self.scale, h / bg:getHeight() * self.scale)
+    local texture = sprites.texture
+
+    do
+      local quad = sprites.quads['boss_body.png']
+      local qx, qy, qw, qh = getViewport(quad, texture)
+      g.draw(texture, quad, 0, 0, 0, w * qw / self.scale, h * qh / self.scale)
+    end
+
+    do
+      local quad = sprites.quads['boss_color.png']
+      local qx, qy, qw, qh = getViewport(quad, texture)
+      g.draw(texture, quad, 0, 0, 0, w * qw / self.scale, h * qh / self.scale)
+    end
   end
 
   if self.use_grayscale then g.setShader(self.grayscale.instance) end
@@ -410,12 +435,6 @@ function EndLevel:draw()
 
   g.setStencilTest()
 
-  if self.start_end_sequence_t then
-    local t = math.pow(math.sin(self.t - self.start_end_sequence_t), 2)
-    for i=1,10 do
-      g.circle('line', self.player.x, self.player.y, t * push:getWidth() * 2 / 10 * i)
-    end
-  end
   if self.debug then
     g.setColor(255, 0, 0, 150)
     self.player.collider:draw('fill')
@@ -434,8 +453,13 @@ function EndLevel:draw()
     if self.transition_death_text then
       self.transition_death_text(self.dt)
     else
+      g.push('all')
+      g.setColor(0, 0, 0)
+      self.shodan_text_shower:draw()
+      g.translate(0, -1)
       g.setColor(255, 75, 50)
       self.shodan_text_shower:draw()
+      g.pop()
     end
     -- local w, h = push:getDimensions()
     -- g.setColor(255, 75, 50)
