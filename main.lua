@@ -12,12 +12,12 @@ function love.load(args)
 
   -- local gameWidth, gameHeight = love.graphics.getDimensions()
   local gameWidth, gameHeight = 256, 256
-  -- local windowWidth, windowHeight = love.window.getDesktopDimensions()
+  local windowWidth, windowHeight = love.window.getDesktopDimensions()
   -- local windowWidth, windowHeight = 1920, 1080
-  local windowWidth, windowHeight = gameWidth * 3, gameHeight * 3
+  -- local windowWidth, windowHeight = gameWidth * 3, gameHeight * 3
 
   push:setupScreen(gameWidth, gameHeight, windowWidth, windowHeight, {
-    fullscreen = false,
+    fullscreen = true,
     clearColor = {50, 50, 50, 255}
   })
 

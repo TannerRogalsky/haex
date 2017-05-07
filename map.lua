@@ -27,7 +27,8 @@ function Map:initialize(file_name)
     local seed = level_data.seed or math.floor(love.math.random(math.pow(2, 53)))
     -- seed = 504852849218
     local random = love.math.newRandomGenerator(seed)
-    print(string.format('Seed: %u', seed))
+    self.random = random
+    print(file_name, string.format('Seed: %u', seed))
     local grid, longest_path
     repeat
       grid = growingTree(width, height, {random = 1, newest = 1}, random)

@@ -309,7 +309,7 @@ function EndLevel:update(dt)
 
             local quote_sound_data = love.sound.newSoundData('sounds/quote.ogg')
             local quote_source = love.audio.newSource(quote_sound_data)
-            self.end_music_source:setVolume(0.1)
+            -- self.end_music_source:setVolume(0.1)
             quote_source:play()
 
             self.aesthetic:send('blockThreshold', 0.073)

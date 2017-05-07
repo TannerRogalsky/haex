@@ -33,7 +33,7 @@ function GridRandom:move(time_to_move)
   self.start_x, self.start_y = self.x, self.y
   local gx, gy = self.map:toGrid(self.x, self.y)
   local node = self.map.node_graph[gy][gx]
-  local neighbor = node.neighbors[love.math.random(#node.neighbors)]
+  local neighbor = node.neighbors[game.map.random:random(#node.neighbors)]
   self.tx, self.ty = self.map:toPixel(neighbor.x, neighbor.y)
 end
 

@@ -67,10 +67,6 @@ function Menu:draw()
   g.push()
     g.translate(0, -10)
     do
-      -- local text = 'HA  EX'
-      -- local tw, th = g.getFont():getWidth(text), g.getFont():getHeight()
-      -- g.setColor(255, 75, 50, 100)
-      -- g.print(text, 0 - tw / 2, 0 - th / 2)
       local text = game.preloaded_images['title_title.png']
       local tw, th = text:getDimensions()
       g.draw(text, -tw / 2, h / 4)
