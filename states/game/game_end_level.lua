@@ -105,6 +105,8 @@ local function textShower(text_data)
 end
 
 function EndLevel:enteredState(map)
+  game.music_source:stop()
+
   love.mouse.setVisible(false)
 
   push._clearColor = {0, 0, 0, 0}
@@ -297,8 +299,14 @@ function EndLevel:update(dt)
       -- self.prevent_radial_distortion = true
       self.remove_level_timer = cron.every(0.02, function()
         if #all_coords == 0 then
+
           self.remove_level_timer = cron.after(1.5, function()
             self.shodan_text = true
+
+            local quote_sound_data = love.sound.newSoundData('sounds/quote.ogg')
+            local quote_source = love.audio.newSource(quote_sound_data)
+            quote_source:play()
+
             self.aesthetic:send('blockThreshold', 0.073)
             self.aesthetic:send('lineThreshold', 0.23)
 
@@ -321,6 +329,8 @@ function EndLevel:update(dt)
                   g.setColor(255, 75, 50)
                   g.print('DIE')
                   g.pop()
+
+                  game.music_source:play()
 
                   if t / 5 >= 1 then
                     ratio = t / 5 - 1
