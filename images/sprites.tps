@@ -76,7 +76,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>1</uint>
+        <uint>7</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -187,7 +187,7 @@
             <key>trimMargin</key>
             <uint>0</uint>
             <key>trimMode</key>
-            <enum type="SpriteSettings::TrimMode">Trim</enum>
+            <enum type="SpriteSettings::TrimMode">None</enum>
             <key>tracerTolerance</key>
             <int>200</int>
             <key>heuristicMask</key>
@@ -199,6 +199,22 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">../source_images/boss_alpha.png</key>
+            <key type="filename">../source_images/boss_body.png</key>
+            <key type="filename">../source_images/boss_color.png</key>
+            <key type="filename">../source_images/boss_contrast.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>32,32,64,64</rect>
+                <key>scale9Paddings</key>
+                <rect>32,32,64,64</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">../source_images/enemy1_alpha.png</key>
             <key type="filename">../source_images/enemy1_body.png</key>
             <key type="filename">../source_images/enemy1_color.png</key>

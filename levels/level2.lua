@@ -14,5 +14,5 @@ return {
   },
   blockThreshold = 0.093,
   lineThreshold = 0.33,
-  seed = 1197219778692350
+  -- seed = 1197219778692350
 }
