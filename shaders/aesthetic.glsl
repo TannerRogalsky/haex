@@ -43,12 +43,12 @@ vec4 effect(vec4 color, Image tex, vec2 uv, vec2 pc) {
     uv_b += dist * 0.125;
   }
 
-  uv_r = radialDistortion(uv_r, .24)  + vec2(.001, 0);
+  uv_r = radialDistortion(uv_r, .24)  + vec2(.001, 0.0);
   uv_g = radialDistortion(uv_g, .20);
-  uv_b = radialDistortion(uv_b, .16) - vec2(.001, 0);
-  vec4 res = vec4(Texel(tex, uv_r).r, Texel(tex, uv_g).g, Texel(tex, uv_b).b, 1)
-    - cos(uv_g.y * 128. * 3.142 * 2) * .01
-    - sin(uv_g.x * 128. * 3.142 * 2) * .01;
+  uv_b = radialDistortion(uv_b, .16) - vec2(.001, 0.0);
+  vec4 res = vec4(Texel(tex, uv_r).r, Texel(tex, uv_g).g, Texel(tex, uv_b).b, 1.0)
+    - cos(uv_g.y * 128.0 * 3.142 * 2.0) * .01
+    - sin(uv_g.x * 128.0 * 3.142 * 2.0) * .01;
 
   vec4 outColor = res * Texel(tex, uv_g).a;
 
