@@ -15,16 +15,6 @@ function Menu:enteredState()
   self.aesthetic:send('radialBreathingScale', 0.01)
 
   g.setFont(self.preloaded_fonts["04b03_24"])
-
-  local sprites = require('images.sprites')
-
-  self.menu_mesh = g.newMesh({
-    {0, 0, 0, 0},
-    {0, 1, 0, 1},
-    {1, 1, 1, 1},
-    {1, 0, 1, 0},
-  }, 'fan', 'static')
-  self.menu_mesh:setTexture(self.preloaded_images['boss_contrast.png'])
 end
 
 function Menu:update(dt)

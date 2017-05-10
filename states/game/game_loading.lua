@@ -44,6 +44,7 @@ function Loading:enteredState()
   self.grayscale = ShaderManager:load('grayscale', 'shaders/grayscale.glsl')
   self.aesthetic = ShaderManager:load('aesthetic', 'shaders/aesthetic.glsl')
   self.menu_shader = ShaderManager:load('menu', 'shaders/menu.glsl')
+  self.vignette_shader = ShaderManager:load('vignette', 'shaders/vignette.glsl')
   g.setFont(self.preloaded_fonts["04b03_16"])
 
   self.joystick = love.joystick.getJoysticks()[1]
@@ -54,6 +55,14 @@ function Loading:enteredState()
     self.music_source = self.preloaded_sources['music.ogg']
     self.music_source:setLooping(true)
     self.music_source:play()
+
+    self.menu_mesh = g.newMesh({
+      {0, 0, 0, 0},
+      {0, 1, 0, 1},
+      {1, 1, 1, 1},
+      {1, 0, 1, 0},
+    }, 'fan', 'static')
+    self.menu_mesh:setTexture(self.preloaded_images['boss_contrast.png'])
 
     if game.start_level then
       self:gotoState("Main", Map:new(game.start_level))

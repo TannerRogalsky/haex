@@ -147,22 +147,6 @@ function EndLevel:enteredState(map)
   do
     local w, h = push:getDimensions()
     local lh = g.getFont():getHeight()
-    self.shodan_text_shower = textShower({
-      {function(t) return 'LOOK AT YOU, ' .. interpString('MAN', 'HACKER', t / 5) end, w * 0.1, h * 0.1},
-      {'A PATHETIC CREATURE OF', w * 0.15, h * 0.3},
-      {'MEAT AND BONE', w * 0.25, h * 0.3 + lh},
-      {'PANTING AND SWEATING AS', w * 0.1, h * 0.5},
-      {'YOU RUN THROUGH MY CORRIDORS', w * 0.0, h * 0.5 + lh},
-      {'HOW CAN YOU CHALLENGE A', w * 0.1, h * 0.7},
-      {'PERFECT,', w * 0.3, h * 0.7 + lh * 1},
-      {'IMMORTAL,', w * 0.4, h * 0.7 + lh * 2},
-      {'MACHINE?', w * 0.5, h * 0.7 + lh * 3},
-    })
-  end
-
-  do
-    local w, h = push:getDimensions()
-    local lh = g.getFont():getHeight()
     self.die_text_position = {
       x = w * 0.5,
       y = h * 0.7 + lh * 2
@@ -341,12 +325,12 @@ function EndLevel:update(dt)
                   game.music_source:play()
 
                   if t / 5 >= 1 then
-                    ratio = t / 5 - 1
+                    ratio = math.min(1, t / 5 - 1)
                     self.aesthetic:send('blockThreshold', 0.073 + ratio * 0.927)
                     self.aesthetic:send('lineThreshold', 0.23 + ratio * 0.77)
                   end
 
-                  if t / 5 >= 2 then
+                  if t / 5 >= 2.5 then
                     self.player.dead = true
                     self:gotoState('Win')
                   end
@@ -441,6 +425,13 @@ function EndLevel:draw()
       local x, y = game.map:toPixel(pos.x, pos.y)
       g.draw(texture, quad, x, y + math.sin(self.t + x * y) * 5, 0, 3, 3)
     end
+  end
+
+  do
+    local w, h = push:getDimensions()
+    g.setShader(self.vignette_shader.instance)
+    g.draw(self.menu_mesh, 0, 0, 0, w * 4, h * 4)
+    g.setShader()
   end
 
   g.setColor(255, 255, 255)

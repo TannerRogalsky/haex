@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="5" height="1" tilewidth="64" tileheight="64" nextobjectid="1">
+ <tileset firstgid="1" name="tiles" tilewidth="64" tileheight="64" tilecount="40" columns="0">
+  <tile id="0">
+   <image width="64" height="64" source="../source_images/tiles/tile_280.png"/>
+  </tile>
+  <tile id="1">
+   <image width="64" height="64" source="../source_images/tiles/tile_281.png"/>
+  </tile>
+  <tile id="2">
+   <image width="64" height="64" source="../source_images/tiles/tile_282.png"/>
+  </tile>
+  <tile id="3">
+   <image width="64" height="64" source="../source_images/tiles/tile_283.png"/>
+  </tile>
+  <tile id="4">
+   <image width="64" height="64" source="../source_images/tiles/tile_284.png"/>
+  </tile>
+  <tile id="5">
+   <image width="64" height="64" source="../source_images/tiles/tile_285.png"/>
+  </tile>
+  <tile id="6">
+   <image width="64" height="64" source="../source_images/tiles/tile_286.png"/>
+  </tile>
+  <tile id="7">
+   <image width="64" height="64" source="../source_images/tiles/tile_287.png"/>
+  </tile>
+  <tile id="8">
+   <image width="64" height="64" source="../source_images/tiles/tile_288.png"/>
+  </tile>
+  <tile id="9">
+   <image width="64" height="64" source="../source_images/tiles/tile_307.png"/>
+  </tile>
+  <tile id="10">
+   <image width="64" height="64" source="../source_images/tiles/tile_308.png"/>
+  </tile>
+  <tile id="11">
+   <image width="64" height="64" source="../source_images/tiles/tile_309.png"/>
+  </tile>
+  <tile id="12">
+   <image width="64" height="64" source="../source_images/tiles/tile_310.png"/>
+  </tile>
+  <tile id="13">
+   <image width="64" height="64" source="../source_images/tiles/tile_311.png"/>
+  </tile>
+  <tile id="14">
+   <image width="64" height="64" source="../source_images/tiles/tile_312.png"/>
+  </tile>
+  <tile id="15">
+   <image width="64" height="64" source="../source_images/tiles/tile_313.png"/>
+  </tile>
+  <tile id="16">
+   <image width="64" height="64" source="../source_images/tiles/tile_314.png"/>
+  </tile>
+  <tile id="17">
+   <image width="64" height="64" source="../source_images/tiles/tile_315.png"/>
+  </tile>
+  <tile id="18">
+   <image width="64" height="64" source="../source_images/tiles/tile_334.png"/>
+  </tile>
+  <tile id="19">
+   <image width="64" height="64" source="../source_images/tiles/tile_335.png"/>
+  </tile>
+  <tile id="20">
+   <image width="64" height="64" source="../source_images/tiles/tile_336.png"/>
+  </tile>
+  <tile id="21">
+   <image width="64" height="64" source="../source_images/tiles/tile_337.png"/>
+  </tile>
+  <tile id="22">
+   <image width="64" height="64" source="../source_images/tiles/tile_338.png"/>
+  </tile>
+  <tile id="23">
+   <image width="64" height="64" source="../source_images/tiles/tile_339.png"/>
+  </tile>
+  <tile id="24">
+   <image width="64" height="64" source="../source_images/tiles/tile_340.png"/>
+  </tile>
+  <tile id="25">
+   <image width="64" height="64" source="../source_images/tiles/tile_341.png"/>
+  </tile>
+  <tile id="26">
+   <image width="64" height="64" source="../source_images/tiles/tile_361.png"/>
+  </tile>
+  <tile id="27">
+   <image width="64" height="64" source="../source_images/tiles/tile_362.png"/>
+  </tile>
+  <tile id="28">
+   <image width="64" height="64" source="../source_images/tiles/tile_363.png"/>
+  </tile>
+  <tile id="29">
+   <image width="64" height="64" source="../source_images/tiles/tile_364.png"/>
+  </tile>
+  <tile id="30">
+   <image width="64" height="64" source="../source_images/tiles/tile_365.png"/>
+  </tile>
+  <tile id="31">
+   <image width="64" height="64" source="../source_images/tiles/tile_366.png"/>
+  </tile>
+  <tile id="32">
+   <image width="64" height="64" source="../source_images/tiles/tile_390.png"/>
+  </tile>
+  <tile id="33">
+   <image width="64" height="64" source="../source_images/tiles/tile_391.png"/>
+  </tile>
+  <tile id="34">
+   <image width="64" height="64" source="../source_images/tiles/tile_392.png"/>
+  </tile>
+  <tile id="35">
+   <image width="64" height="64" source="../source_images/tiles/tile_393.png"/>
+  </tile>
+  <tile id="36">
+   <image width="64" height="64" source="../source_images/tiles/tile_417.png"/>
+  </tile>
+  <tile id="37">
+   <image width="64" height="64" source="../source_images/tiles/tile_418.png"/>
+  </tile>
+  <tile id="38">
+   <image width="64" height="64" source="../source_images/tiles/tile_419.png"/>
+  </tile>
+  <tile id="39">
+   <image width="64" height="64" source="../source_images/tiles/tile_420.png"/>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="5" height="1">
+  <data encoding="csv">
+16,3,6,16,6
+</data>
+ </layer>
+</map>
