@@ -45,11 +45,11 @@ end
 function Over:enteredState()
   self.start_t = self.t
 
-  self.laugh_track_data = love.sound.newSoundData('sounds/agent_smith_laugh.ogg')
-  self.laugh_track = love.audio.newSource(self.laugh_track_data)
+  self.laugh_track = self.preloaded_sources['agent_smith_laugh.ogg']
   self.laugh_track:play()
 
-  self.laugh_track_time = self.laugh_track_data:getDuration()
+  -- self.laugh_track_time = self.laugh_track_data:getDuration()
+  self.laugh_track_time = 5.5 -- I know it's 6 seconds. Just hard code that.
 end
 
 function Over:update(dt)
@@ -109,7 +109,6 @@ function Over:exitedState()
   self.aesthetic:send('screenTransitionRatio', 0)
   self.start_t = nil
 
-  self.laugh_track_data = nil
   self.laugh_track = nil
 end
 

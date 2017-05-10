@@ -13,6 +13,7 @@ function Loading:enteredState()
   self.loader = require 'lib/love-loader/love-loader'
   self.preloaded_images = {}
   self.preloaded_fonts = {}
+  self.preloaded_sources = {}
 
   -- puts loaded images into the preloaded_images hash with they key being the file name
   for index, image in ipairs(love.filesystem.getDirectoryItems('images')) do
@@ -32,6 +33,13 @@ function Loading:enteredState()
     end
   end
 
+  for index, filename in ipairs(love.filesystem.getDirectoryItems('sounds')) do
+    if filename:match('(.*).ogg$') ~= nil then
+      self.loader.newSource(self.preloaded_sources, filename, 'sounds/' .. filename, 'stream')
+    end
+  end
+
+
   self.obscuring_mesh_shader = ShaderManager:load('map_obscuring', 'shaders/map_obscuring.glsl')
   self.grayscale = ShaderManager:load('grayscale', 'shaders/grayscale.glsl')
   self.aesthetic = ShaderManager:load('aesthetic', 'shaders/aesthetic.glsl')
@@ -43,6 +51,9 @@ function Loading:enteredState()
   self.loader.start(function()
     -- loader finished callback
     -- initialize game stuff here
+    self.music_source = self.preloaded_sources['music.ogg']
+    self.music_source:setLooping(true)
+    self.music_source:play()
 
     if game.start_level then
       self:gotoState("Main", Map:new(game.start_level))
@@ -79,10 +90,6 @@ function Loading:enteredState()
       self.numbers_text:add(string.format(numbers_string, unpack(numbers[i + 1])), 0, lineHeight * i)
     end
   end)
-
-  self.music_source = love.audio.newSource('sounds/music.ogg')
-  self.music_source:setLooping(true)
-  self.music_source:play()
 end
 
 function Loading:draw()

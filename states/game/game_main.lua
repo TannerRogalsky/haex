@@ -102,14 +102,13 @@ function Main:update(dt)
       if self.start_end_sequence_t == nil then
         self.start_end_sequence_t = self.t
         is_ending = true
-        local warp_sound_data = love.sound.newSoundData('sounds/level_finish.ogg')
-        local warp_source = love.audio.newSource(warp_sound_data)
+        local warp_source = self.preloaded_sources['level_finish.ogg']
         warp_source:setVolume(0.6)
         warp_source:play()
       else
         is_ending = true
       end
-    elseif shape.parent and shape.parent:isInstanceOf(Enemy) then
+    elseif shape.parent and shape.parent:isInstanceOf(Enemy) and self.start_end_sequence_t == nil then
       self.player.dead = true
       self:gotoState('Over')
       return
@@ -117,6 +116,7 @@ function Main:update(dt)
   end
   if not is_ending then
     self.start_end_sequence_t = nil
+    self.preloaded_sources['level_finish.ogg']:stop()
   elseif self.start_end_sequence_t and (self.t - self.start_end_sequence_t) >= math.pi then
     self:gotoState('TransitionToNextLevel')
   end

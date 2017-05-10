@@ -105,7 +105,7 @@ local function textShower(text_data)
 end
 
 function EndLevel:enteredState(map)
-  self.end_music_source = love.audio.newSource('sounds/last_level_drone.ogg')
+  self.end_music_source = self.preloaded_sources['last_level_drone.ogg']
   self.end_music_source:setLooping(true)
   self.end_music_source:setVolume(0.4)
   self.end_music_source:play()
@@ -310,8 +310,7 @@ function EndLevel:update(dt)
           self.remove_level_timer = cron.after(1.5, function()
             self.shodan_text = true
 
-            local quote_sound_data = love.sound.newSoundData('sounds/quote.ogg')
-            local quote_source = love.audio.newSource(quote_sound_data)
+            local quote_source = self.preloaded_sources['quote.ogg']
             -- self.end_music_source:setVolume(0.1)
             quote_source:play()
 

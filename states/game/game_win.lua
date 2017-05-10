@@ -3,11 +3,7 @@ local Win = Game:addState('Win')
 function Win:enteredState()
   self.start_t = self.t
 
-  self.laugh_track_data = love.sound.newSoundData('sounds/agent_smith_laugh.ogg')
-  -- self.laugh_track = love.audio.newSource(self.laugh_track_data)
-  -- self.laugh_track:play()
-
-  self.laugh_track_time = self.laugh_track_data:getDuration()
+  self.laugh_track_time = 5.5
 end
 
 function Win:update(dt)
